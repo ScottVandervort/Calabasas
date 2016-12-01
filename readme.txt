@@ -136,7 +136,7 @@ These feature need to be rendered using DirectX.
 Does renderer get injected into PumpkinFaceTracker; PumpkinFaceTracker would call renderer directly.
 Or, does PumpkinFaceTracker broadcast an event that renderer listens for? Or, calls renderer method directly based on interface (faster).
 
-Day 12
+Day 12 - Face API facial point enumeration is incomplete!
 ------------------------------------------
 
 It looks like the FeaturePoint enumeration does not include all of the facial points that I have seen displayed in the Kinnect propaganda online. 
@@ -145,3 +145,15 @@ It looks like the FeaturePoint enumeration does not include all of the facial po
 Next step is to create a 2nd Draw() method in Renderer that just takes all points from Kinnect, Renders the point as their index/number on the screen.
 
 Ugh.....
+
+Day 13 - Forget D3D, I am using D2D ... and DirectWrite
+------------------------------------------
+
+	SharpDx has better examples than the one I was originally working from:
+		https://github.com/sharpdx/SharpDX-Samples/blob/master/Desktop/Direct2D1/MiniRect/Program.cs
+		
+	It is going to be esier to use Direct2D than Direct3D. It looks like it supports bitmaps, shaders, ... just about everything I need to render a 2D jack-o-lantern face.
+	
+	Furthermore DirectWrite will make it easier to render numbers on the screen that coordinate with the facial positions.
+	
+        

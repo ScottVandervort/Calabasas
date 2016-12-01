@@ -6,11 +6,11 @@
         {
             PumpkinFaceRenderer pumpkinFaceRenderer = new PumpkinFaceRenderer();
 
-            Camera camera = new Camera(pumpkinFaceRenderer);
+            //Camera camera = new Camera(pumpkinFaceRenderer);
 
             pumpkinFaceRenderer.Run();
 
-            camera.Run();        
+            //camera.Run();        
         }
     }
 }
