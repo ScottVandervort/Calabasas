@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{4D64F9B8-0872-4747-BFEB-947D497C2656}</ProjectGuid>
+    <ProjectGuid>{EB223A1C-B607-4FE4-9404-291E2254CC17}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PumpkinFaceTracker</RootNamespace>
-    <AssemblyName>PumpkinFaceTracker</AssemblyName>
+    <RootNamespace>Calabasas</RootNamespace>
+    <AssemblyName>Calabasas</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -18,8 +18,8 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS</DefineConstants>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -27,21 +27,12 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Kinect">
-      <HintPath>$(KINECTSDK10_DIR)\Assemblies\Microsoft.Kinect.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Kinect.Toolkit">
-      <HintPath>$(KINECT_TOOLKIT_DIR)\Samples\bin\Microsoft.Kinect.Toolkit.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Kinect.Toolkit.FaceTracking">
-      <HintPath>$(KINECT_TOOLKIT_DIR)\Samples\bin\Microsoft.Kinect.Toolkit.FaceTracking.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -54,16 +45,24 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SkeletonFaceTracker.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Calabasas.PumpkinFaceRenderer\Calabasas.PumpkinFaceRenderer.csproj">
+      <Project>{e8048044-5fb9-4d58-a7e9-b67545b660e9}</Project>
+      <Name>Calabasas.PumpkinFaceRenderer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Calabasas.PumpkinFaceTracker\Calabasas.PumpkinFaceTracker.csproj">
+      <Project>{4d64f9b8-0872-4747-bfeb-947d497c2656}</Project>
+      <Name>Calabasas.PumpkinFaceTracker</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy "$(KINECT_TOOLKIT_DIR)Redist\amd64\FaceTrackData.dll" "$(TargetDir)FaceTrackData.dll"
-copy "$(KINECT_TOOLKIT_DIR)Redist\amd64\FaceTrackLib.dll" "$(TargetDir)FaceTrackLib.dll"
-</PostBuildEvent>
+copy "$(KINECT_TOOLKIT_DIR)Redist\amd64\FaceTrackLib.dll" "$(TargetDir)FaceTrackLib.dll"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

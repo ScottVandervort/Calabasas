@@ -3,35 +3,33 @@ using Microsoft.Kinect.Toolkit;
 using System;
 using System.Collections.Generic;
 
-namespace PumpkinFaceTracker
+namespace Calabasas
 {
-    class Program
+    public class Camera
     {
-        static private readonly KinectSensorChooser sensorChooser = new KinectSensorChooser();
-        static private readonly Dictionary<int, SkeletonFaceTracker> trackedSkeletons = new Dictionary<int, SkeletonFaceTracker>();
-        static private DepthImageFormat depthImageFormat = DepthImageFormat.Undefined;
-        static private short[] depthImage;
-        static private Skeleton[] skeletonData;
-        static private ColorImageFormat colorImageFormat = ColorImageFormat.Undefined;
-        static private byte[] colorImage;
+        private readonly KinectSensorChooser sensorChooser = new KinectSensorChooser();
+        private readonly Dictionary<int, PumpkinFaceTracker> trackedSkeletons = new Dictionary<int, PumpkinFaceTracker>();
+        private DepthImageFormat depthImageFormat = DepthImageFormat.Undefined;
+        private short[] depthImage;
+        private Skeleton[] skeletonData;
+        private ColorImageFormat colorImageFormat = ColorImageFormat.Undefined;
+        private byte[] colorImage;
         private const uint MaxMissedFrames = 100;
+        private PumpkinFaceRenderer pumpkinFaceRenderer;
 
-        static void Main(string[] args)
+        public Camera (PumpkinFaceRenderer pumpkinFaceRenderer)
+        {
+            this.pumpkinFaceRenderer = pumpkinFaceRenderer;
+        }
+
+        public void Run ()
         {
             sensorChooser.KinectChanged += SensorChooser_KinectChanged;
 
             sensorChooser.Start();
-
-            do
-            {
-                while (!Console.KeyAvailable)
-                {
-                    // Do something
-                }
-            } while (Console.ReadKey(true).Key != ConsoleKey.Escape);
         }
 
-        private static void SensorChooser_KinectChanged(object sender, KinectChangedEventArgs e)
+        private void SensorChooser_KinectChanged(object sender, KinectChangedEventArgs e)
         {
             KinectSensor oldSensor = e.OldSensor;
             KinectSensor newSensor = e.NewSensor;
@@ -86,7 +84,7 @@ namespace PumpkinFaceTracker
             }
         }
 
-        private static void KinectSensorOnAllFramesReady(object sender, AllFramesReadyEventArgs e)
+        private void KinectSensorOnAllFramesReady(object sender, AllFramesReadyEventArgs e)
         {
             ColorImageFrame colorImageFrame = null;
             DepthImageFrame depthImageFrame = null;
@@ -149,11 +147,11 @@ namespace PumpkinFaceTracker
                         // We want keep a record of any skeleton, tracked or untracked.
                         if (!trackedSkeletons.ContainsKey(skeleton.TrackingId))
                         {
-                            trackedSkeletons.Add(skeleton.TrackingId, new SkeletonFaceTracker());
+                            trackedSkeletons.Add(skeleton.TrackingId, new PumpkinFaceTracker(pumpkinFaceRenderer));
                         }
 
                         // Give each tracker the upated frame.
-                        SkeletonFaceTracker skeletonFaceTracker;
+                        PumpkinFaceTracker skeletonFaceTracker;
                         if (trackedSkeletons.TryGetValue(skeleton.TrackingId, out skeletonFaceTracker))
                         {
                             skeletonFaceTracker.OnFrameReady(sensorChooser.Kinect, colorImageFormat, colorImage, depthImageFormat, depthImage, skeleton);
@@ -185,7 +183,7 @@ namespace PumpkinFaceTracker
             }
         }
 
-        static private void RemoveOldTrackers(int currentFrameNumber)
+        private void RemoveOldTrackers(int currentFrameNumber)
         {
             var trackersToRemove = new List<int>();
 
@@ -205,13 +203,13 @@ namespace PumpkinFaceTracker
             }
         }
 
-        private static void RemoveTracker(int trackingId)
+        private void RemoveTracker(int trackingId)
         {
             trackedSkeletons[trackingId].Dispose();
             trackedSkeletons.Remove(trackingId);
         }
 
-        private static void ResetFaceTracking()
+        private void ResetFaceTracking()
         {
             foreach (int trackingId in new List<int>(trackedSkeletons.Keys))
             {

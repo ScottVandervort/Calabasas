@@ -48,7 +48,10 @@ Temporary Items
 
 # Ignoring build artifacts
 packages/**
-PumpkinFaceAnimation/bin/**
-PumpkinFaceAnimation/obj/**
-PumpkinFaceTracker/bin/**
-PumpkinFaceTracker/obj/**
+Calabasas.PumpkinFaceRenderer/bin/**
+Calabasas.PumpkinFaceRenderer/obj/**
+Calabasas.PumpkinFaceTracker/bin/**
+Calabasas.PumpkinFaceTracker/obj/**
+Calabasas/bin/**
+Calabasas/obj/**
+.vs

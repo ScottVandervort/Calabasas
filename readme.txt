@@ -126,7 +126,22 @@ I finally was able to ditch the Toolkit and Toolkit.Facetracking projects and ju
 
 This helped a lot: https://channel9.msdn.com/Forums/Coffeehouse/kinect-face-tracking-tutorial
 
+Day 11 - Architecture
+------------------------------------------
 
+PumpkinFaceTracker.Program (i.e., the Kinnect) spawns a new PumpkinFaceTracker object for every frame and stores it in array. 
+Each PumpkinFaceTracker does some logic and generates facial features.
+These feature need to be rendered using DirectX.
 
+Does renderer get injected into PumpkinFaceTracker; PumpkinFaceTracker would call renderer directly.
+Or, does PumpkinFaceTracker broadcast an event that renderer listens for? Or, calls renderer method directly based on interface (faster).
 
+Day 12
+------------------------------------------
 
+It looks like the FeaturePoint enumeration does not include all of the facial points that I have seen displayed in the Kinnect propaganda online. 
+	Or, the enumeration is in a different order.
+
+Next step is to create a 2nd Draw() method in Renderer that just takes all points from Kinnect, Renders the point as their index/number on the screen.
+
+Ugh.....

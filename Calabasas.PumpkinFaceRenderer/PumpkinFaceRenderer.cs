@@ -11,9 +11,9 @@ using System.Text;
 using System.Threading.Tasks;
 using D3D11 = SharpDX.Direct3D11;
 
-namespace PumpkinFaceAnimation
+namespace Calabasas
 {
-    public class Game : IDisposable
+    public class PumpkinFaceRenderer : IDisposable
     {
         private RenderForm renderForm;
 
@@ -38,14 +38,24 @@ namespace PumpkinFaceAnimation
             new D3D11.InputElement("COLOR", 0, Format.R32G32B32A32_Float, 12, 0, D3D11.InputClassification.PerVertexData, 0)
         };
 
-        // Triangle vertices
-        private VertexPositionColor[] vertices = new VertexPositionColor[] { new VertexPositionColor(new Vector3(-0.5f, 0.5f, 0.0f), SharpDX.Color.Red), new VertexPositionColor(new Vector3(0.5f, 0.5f, 0.0f), SharpDX.Color.Green), new VertexPositionColor(new Vector3(0.0f, -0.5f, 0.0f), SharpDX.Color.Blue) };
-        private D3D11.Buffer triangleVertexBuffer;
+        private VertexPositionColor[] rightEyebrowVertices;
+        private VertexPositionColor[] rightEyeVertices;
+        private VertexPositionColor[] leftEyebrowVertices;
+        private VertexPositionColor[] leftEyeVertices;
+        private VertexPositionColor[] noseVertices;
+        private VertexPositionColor[] mouthVertices;
+
+        private D3D11.Buffer rightEyebrowVertexBuffer;
+        private D3D11.Buffer rightEyeVertexBuffer;
+        private D3D11.Buffer leftEyebrowVertexBuffer;
+        private D3D11.Buffer leftEyeVertexBuffer;
+        private D3D11.Buffer noseVertexBuffer;
+        private D3D11.Buffer mouthVertexBuffer;
 
         /// <summary>
         /// Create and initialize a new game.
         /// </summary>
-        public Game()
+        public PumpkinFaceRenderer()
         {
             // Set window properties
             renderForm = new RenderForm("My first SharpDX game");
@@ -54,7 +64,6 @@ namespace PumpkinFaceAnimation
 
             InitializeDeviceResources();
             InitializeShaders();
-            InitializeTriangle();
         }
 
         /// <summary>
@@ -130,12 +139,6 @@ namespace PumpkinFaceAnimation
             d3dDeviceContext.InputAssembler.InputLayout = inputLayout;
         }
 
-        private void InitializeTriangle()
-        {
-            // Create a vertex buffer, and use our array with vertices as data
-            triangleVertexBuffer = D3D11.Buffer.Create(d3dDevice, D3D11.BindFlags.VertexBuffer, vertices);
-        }
-
         /// <summary>
         /// Draw the game.
         /// </summary>
@@ -147,21 +150,57 @@ namespace PumpkinFaceAnimation
             // Clear the screen
             d3dDeviceContext.ClearRenderTargetView(renderTargetView, new SharpDX.Color(32, 103, 178));
 
-            // Set vertex buffer
-            d3dDeviceContext.InputAssembler.SetVertexBuffers(0, new D3D11.VertexBufferBinding(triangleVertexBuffer, Utilities.SizeOf<VertexPositionColor>(), 0));
-
-            // Draw the triangle
-            d3dDeviceContext.Draw(vertices.Count(), 0);
+            Draw(rightEyebrowVertexBuffer, rightEyebrowVertices);
+            Draw(rightEyeVertexBuffer, rightEyeVertices);
+            Draw(leftEyebrowVertexBuffer, leftEyebrowVertices);
+            Draw(leftEyeVertexBuffer, leftEyeVertices);
+            Draw(mouthVertexBuffer, mouthVertices);
+            Draw(noseVertexBuffer, noseVertices);
 
             // Swap front and back buffer
             swapChain.Present(1, PresentFlags.None);
+        }
+
+        private void Draw (D3D11.Buffer buffer, VertexPositionColor [] vertices)
+        {
+            // Set vertex buffer
+            d3dDeviceContext.InputAssembler.SetVertexBuffers(0, new D3D11.VertexBufferBinding(buffer, Utilities.SizeOf<VertexPositionColor>(), 0));
+
+            // Draw the triangle
+            d3dDeviceContext.Draw(vertices.Count(), 0);
+        }
+
+        public void Draw (System.Drawing.PointF [] leftEyebrow, System.Drawing.PointF [] leftEye, System.Drawing.PointF [] rightEyebrow, System.Drawing.PointF [] rightEye, System.Drawing.PointF [] mouth, System.Drawing.PointF [] nose)
+        {
+            rightEyebrowVertices = VertexPositionColor.Convert(rightEyebrow, SharpDX.Color.OrangeRed);
+            rightEyebrowVertexBuffer = D3D11.Buffer.Create(d3dDevice, D3D11.BindFlags.VertexBuffer, rightEyebrowVertices);
+
+            rightEyeVertices = VertexPositionColor.Convert(rightEye, SharpDX.Color.OrangeRed);
+            rightEyeVertexBuffer = D3D11.Buffer.Create(d3dDevice, D3D11.BindFlags.VertexBuffer, rightEyeVertices);
+
+            leftEyebrowVertices = VertexPositionColor.Convert(leftEyebrow, SharpDX.Color.OrangeRed);
+            leftEyebrowVertexBuffer = D3D11.Buffer.Create(d3dDevice, D3D11.BindFlags.VertexBuffer, leftEyebrowVertices);
+
+            leftEyeVertices = VertexPositionColor.Convert(leftEye, SharpDX.Color.OrangeRed);
+            leftEyeVertexBuffer = D3D11.Buffer.Create(d3dDevice, D3D11.BindFlags.VertexBuffer, leftEyeVertices);
+
+            noseVertices = VertexPositionColor.Convert(nose, SharpDX.Color.OrangeRed);
+            noseVertexBuffer = D3D11.Buffer.Create(d3dDevice, D3D11.BindFlags.VertexBuffer, noseVertices);
+
+            mouthVertices = VertexPositionColor.Convert(mouth, SharpDX.Color.OrangeRed);
+            mouthVertexBuffer = D3D11.Buffer.Create(d3dDevice, D3D11.BindFlags.VertexBuffer, mouthVertices);
         }
 
         public void Dispose()
         {
             inputLayout.Dispose();
             inputSignature.Dispose();
-            triangleVertexBuffer.Dispose();
+            mouthVertexBuffer.Dispose();
+            leftEyebrowVertexBuffer.Dispose();
+            leftEyeVertexBuffer.Dispose();
+            rightEyebrowVertexBuffer.Dispose();
+            rightEyeVertexBuffer.Dispose();
+            noseVertexBuffer.Dispose();
             vertexShader.Dispose();
             pixelShader.Dispose();
             renderTargetView.Dispose();
