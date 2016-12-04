@@ -105,7 +105,7 @@ namespace Calabasas
                         leftEyePoints[index] = new System.Drawing.PointF(kinectFacePoints[LeftEyeFeaturePointStartingIndex + index].X, kinectFacePoints[LeftEyeFeaturePointStartingIndex + index].Y);
 
 
-                    //pumpkinFaceRenderer.Draw();
+                    pumpkinFaceRenderer.Draw(kinectFacePoints.ConvertToPointF());
                 }
             }
         }

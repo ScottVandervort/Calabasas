@@ -24,7 +24,9 @@ namespace Calabasas
         private RenderTargetView renderTargetView;
         private RenderTarget d2dRenderTarget;
         private Texture2D backBuffer;
-        private Surface surface;        
+        private Surface surface;
+
+        private System.Drawing.PointF[] points = { };
 
         public TextFormat TextFormat { get; private set; }
         public TextLayout TextLayout { get; private set; }
@@ -69,12 +71,12 @@ namespace Calabasas
                 new RenderTargetProperties(new PixelFormat(Format.Unknown, SharpDX.Direct2D1.AlphaMode.Premultiplied)));
 
             // Initialize a TextFormat
-            TextFormat = new TextFormat(dwFactory, "Calibri", 128) { TextAlignment = TextAlignment.Center, ParagraphAlignment = ParagraphAlignment.Center };
+            TextFormat = new TextFormat(dwFactory, "Calibri", 20) { TextAlignment = TextAlignment.Center, ParagraphAlignment = ParagraphAlignment.Center };
 
             d2dRenderTarget.TextAntialiasMode = SharpDX.Direct2D1.TextAntialiasMode.Cleartype;
 
             // Initialize a TextLayout.
-            TextLayout = new TextLayout(dwFactory, "SharpDX D2D1 - DWrite", TextFormat, 100, 100);
+            //TextLayout = new TextLayout(dwFactory, "1", TextFormat, 10, 10);
 
             // Initialize a Brush.
             SceneColorBrush = new SolidColorBrush(d2dRenderTarget, Color.White);
@@ -85,6 +87,11 @@ namespace Calabasas
         {
             // Start the render loop
             RenderLoop.Run(renderForm, RenderCallback);
+        }
+
+        public void Draw(System.Drawing.PointF [] points)
+        {
+            this.points = points;
         }
 
         public void Draw(System.Drawing.PointF[] leftEyebrow, System.Drawing.PointF[] leftEye, System.Drawing.PointF[] rightEyebrow, System.Drawing.PointF[] rightEye, System.Drawing.PointF[] mouth, System.Drawing.PointF[] nose)
@@ -115,7 +122,11 @@ namespace Calabasas
             d2dRenderTarget.BeginDraw();
             d2dRenderTarget.Clear(Color.Black);
 
-            d2dRenderTarget.DrawTextLayout(new Vector2(0, 0), TextLayout, SceneColorBrush, DrawTextOptions.None);
+            for (int pointIndex = 0; pointIndex < points.Length; pointIndex++)
+            {
+                TextLayout = new TextLayout(dwFactory, pointIndex.ToString(), TextFormat, 400, 400);
+                d2dRenderTarget.DrawTextLayout(new Vector2(points[pointIndex].X, points[pointIndex].Y), TextLayout, SceneColorBrush, DrawTextOptions.None);
+            }
 
             d2dRenderTarget.EndDraw();
 

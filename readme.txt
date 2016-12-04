@@ -156,4 +156,9 @@ Day 13 - Forget D3D, I am using D2D ... and DirectWrite
 	
 	Furthermore DirectWrite will make it easier to render numbers on the screen that coordinate with the facial positions.
 	
-        
+Day 14 - Now displaying facial points in DirectX as their respective indices
+-------------------------------------------
+
+	... but they are scrunched. Now I need to figure out how to create and apply transforms to D2D. I would like to scale and transform the points that I display.
+
+	This will come in handy when I start "connecting the dots" as well.
