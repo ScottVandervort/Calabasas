@@ -72,12 +72,9 @@ namespace Calabasas
                 new RenderTargetProperties(new PixelFormat(Format.Unknown, SharpDX.Direct2D1.AlphaMode.Premultiplied)));
 
             // Initialize a TextFormat
-            TextFormat = new TextFormat(dwFactory, "Calibri", 10) { TextAlignment = TextAlignment.Center, ParagraphAlignment = ParagraphAlignment.Center };
+            TextFormat = new TextFormat(dwFactory, "Calibri", 6);
 
             d2dRenderTarget.TextAntialiasMode = SharpDX.Direct2D1.TextAntialiasMode.Cleartype;
-
-            // Initialize a TextLayout.
-            //TextLayout = new TextLayout(dwFactory, "1", TextFormat, 10, 10);
 
             // Initialize a Brush.
             SceneColorBrush = new SolidColorBrush(d2dRenderTarget, Color.White);
@@ -138,11 +135,11 @@ namespace Calabasas
 
             for (int pointIndex = 0; pointIndex < points.Length; pointIndex++)
             {
-                TextLayout = new TextLayout(dwFactory, pointIndex.ToString(), TextFormat, 400, 400);
+                TextLayout = new TextLayout(dwFactory, pointIndex.ToString(), TextFormat, 100, 100);
                 d2dRenderTarget.DrawTextLayout(points[pointIndex], TextLayout, SceneColorBrush, DrawTextOptions.None);
             }
 
-           // d2dRenderTarget.Transform = Matrix3x2.Translation(this.center) * Matrix3x2.Scaling(2, 2);
+            d2dRenderTarget.Transform = Matrix3x2.Translation(-center.X, -center.Y) *  Matrix3x2.Scaling(3, 3) * Matrix3x2.Translation(Width/2,Height/2);
 
             d2dRenderTarget.EndDraw();
 

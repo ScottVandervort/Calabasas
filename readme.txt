@@ -171,3 +171,8 @@ Day 15 - Direct2D/SharpDx supports matrix transformations
 	Now need to scale and center the rendered face using a translation and scaling matrix.
 
 	I am a bit rusty so need to figure out how to go about doing this (again).
+	
+	TODO: Document transformation
+			Dispose of Text; Probably should only create when changes.
+			Makesure scaling still fits in screen.
+	
