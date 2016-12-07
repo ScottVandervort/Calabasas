@@ -162,3 +162,12 @@ Day 14 - Now displaying facial points in DirectX as their respective indices
 	... but they are scrunched. Now I need to figure out how to create and apply transforms to D2D. I would like to scale and transform the points that I display.
 
 	This will come in handy when I start "connecting the dots" as well.
+
+Day 15 - Direct2D/SharpDx supports matrix transformations
+-------------------------------------------
+
+	Example: https://github.com/sharpdx/SharpDX-Samples/blob/master/StoreApp/XAML%20SurfaceImageSource%20DirectX%20interop%20sample/C%23/Scenario1Component/Scenario1ImageSource.cs
+
+	Now need to scale and center the rendered face using a translation and scaling matrix.
+
+	I am a bit rusty so need to figure out how to go about doing this (again).
