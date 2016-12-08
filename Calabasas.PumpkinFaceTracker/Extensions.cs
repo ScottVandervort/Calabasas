@@ -15,5 +15,10 @@ namespace Calabasas
 
             return result;
         }
+
+        public static void WriteToFile (this EnumIndexableCollection<FeaturePoint, PointF> collection, string filePath)
+        {
+            
+        }
     }
 }

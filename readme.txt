@@ -176,4 +176,8 @@ Day 15 - Direct2D/SharpDx supports matrix transformations
 			Dispose of Text; Probably should only create when changes.
 			Makesure scaling still fits in screen.
 			Save / Load points from file for static testing
-	
+			Command line should be able to accept sources .. Kinnect or File of Points.	
+
+			Renderer owns the form. It is the only thing that can accept keyboard input. As such, should it "tell" the camera to store points or should it store points itself?
+
+			Camera / Tracker tracks the face and sneds points to render for display.
