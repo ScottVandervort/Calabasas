@@ -175,4 +175,5 @@ Day 15 - Direct2D/SharpDx supports matrix transformations
 	TODO: Document transformation
 			Dispose of Text; Probably should only create when changes.
 			Makesure scaling still fits in screen.
+			Save / Load points from file for static testing
 	
