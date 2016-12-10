@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
-MinimumVisualStudioVersion = 10.0.40219.1
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calabasas", "Calabasas\Calabasas.csproj", "{EB223A1C-B607-4FE4-9404-291E2254CC17}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calabasas.PumpkinFaceRenderer", "Calabasas.PumpkinFaceRenderer\Calabasas.PumpkinFaceRenderer.csproj", "{E8048044-5FB9-4D58-A7E9-B67545B660E9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calabasas.PumpkinFaceTracker", "Calabasas.PumpkinFaceTracker\Calabasas.PumpkinFaceTracker.csproj", "{4D64F9B8-0872-4747-BFEB-947D497C2656}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calabasas.Common", "Calabasas.Common\Calabasas.Common.csproj", "{7A02D461-468E-4EE7-85EF-85782C5720DA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -55,6 +55,14 @@ Global
 		{4D64F9B8-0872-4747-BFEB-947D497C2656}.Release|x64.Build.0 = Release|Any CPU
 		{4D64F9B8-0872-4747-BFEB-947D497C2656}.Release|x86.ActiveCfg = Release|Any CPU
 		{4D64F9B8-0872-4747-BFEB-947D497C2656}.Release|x86.Build.0 = Release|Any CPU
+		{7A02D461-468E-4EE7-85EF-85782C5720DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A02D461-468E-4EE7-85EF-85782C5720DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A02D461-468E-4EE7-85EF-85782C5720DA}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7A02D461-468E-4EE7-85EF-85782C5720DA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7A02D461-468E-4EE7-85EF-85782C5720DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A02D461-468E-4EE7-85EF-85782C5720DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A02D461-468E-4EE7-85EF-85782C5720DA}.Release|x64.ActiveCfg = Release|Any CPU
+		{7A02D461-468E-4EE7-85EF-85782C5720DA}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -188,7 +188,7 @@ Stuff to do ......
 				[ ] Figure out how to transform face array so that they can be viewed in DirectX.
 					[ ] Document / comment transformation process in Journal.
 					[X] Take a screen shot of DirectX.		
-	[ ] Create a enum that maps facial points necessary for Jack-O-Lantern; Eyes, Nose, Mouth, Eyebrows, and (possibly top and sides of head as they should remain static for centering purposes)
+	[ ] Create a enum that maps facial points necessary for Jack-O-Lantern; Eyes, Nose, Mouth, Eyebrows, and possibly top of head, sides of head, and nose as they should remain static for centering purposes ( the jaw moves ).
 		[ ] enum needs to be in a common assembly as it will be used by Renderer and Tracker.
 		[ ] In Kinnect, re-process facial points array to only include those of enum.
 			[ ] Send points to Renderer.
