@@ -32,7 +32,6 @@ namespace Calabasas
         private Vector2 center = new Vector2(0, 0);
 
         public TextFormat TextFormat { get; private set; }
-        public TextLayout TextLayout { get; private set; }
         public SolidColorBrush SceneColorBrush { get; private set; }
 
         public PumpkinFaceRenderer ( IFaceCamera faceCamera )
@@ -130,7 +129,6 @@ namespace Calabasas
             d2dFactory.Dispose();
             dwFactory.Dispose();
             SceneColorBrush.Dispose();
-            TextLayout.Dispose();
             TextFormat.Dispose();
         }
 
@@ -141,9 +139,11 @@ namespace Calabasas
 
             for (int pointIndex = 0; pointIndex < points.Length; pointIndex++)
             {
-                TextLayout = new TextLayout(dwFactory, pointIndex.ToString(), TextFormat, 100, 100);
-                d2dRenderTarget.DrawTextLayout(points[pointIndex], TextLayout, SceneColorBrush, DrawTextOptions.None);
-            }
+                using (TextLayout textLayout = new TextLayout(dwFactory, pointIndex.ToString(), TextFormat, 100, 100))
+                {
+                    d2dRenderTarget.DrawTextLayout(points[pointIndex], textLayout, SceneColorBrush, DrawTextOptions.None);
+                }
+            }           
 
             d2dRenderTarget.Transform = Matrix3x2.Translation(-center.X, -center.Y) *  Matrix3x2.Scaling(3, 3) * Matrix3x2.Translation(Width/2,Height/2);
 
