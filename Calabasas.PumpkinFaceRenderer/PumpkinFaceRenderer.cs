@@ -15,6 +15,8 @@ namespace Calabasas
         private const int Width = 1280;
         private const int Height = 720;
 
+        IFaceCamera faceCamera;
+
         private RenderForm renderForm;
         private SwapChainDescription swapChainDesc;
         private SharpDX.Direct3D11.Device device;
@@ -33,11 +35,15 @@ namespace Calabasas
         public TextLayout TextLayout { get; private set; }
         public SolidColorBrush SceneColorBrush { get; private set; }
 
-        public PumpkinFaceRenderer ()
+        public PumpkinFaceRenderer ( IFaceCamera faceCamera )
         {
             renderForm = new RenderForm("Calabasas");
 
+            this.faceCamera = faceCamera;
+
             renderForm.KeyPress += OnRenderFormKeyPress;
+
+            this.faceCamera.OnFaceChanged += OnFaceChanged;
 
             // SwapChain description
             swapChainDesc = new SwapChainDescription()
@@ -82,10 +88,12 @@ namespace Calabasas
             SceneColorBrush = new SolidColorBrush(d2dRenderTarget, Color.White);
         }
 
-        public void Run()
+        public void Start()
         {
+            faceCamera.Start();
+
             // Start the render loop
-            RenderLoop.Run(renderForm, RenderCallback);
+            RenderLoop.Run(renderForm, OnRenderCallback);
         }
 
         public void Draw(System.Drawing.PointF [] points)
@@ -106,13 +114,10 @@ namespace Calabasas
             this.center = new Vector2(totalX / points.Length, totalY / points.Length);
         }
 
-        public void Draw(System.Drawing.PointF[] leftEyebrow, System.Drawing.PointF[] leftEye, System.Drawing.PointF[] rightEyebrow, System.Drawing.PointF[] rightEye, System.Drawing.PointF[] mouth, System.Drawing.PointF[] nose)
-        {
-
-        }
-
         public void Dispose()
         {
+            this.faceCamera.Stop();
+
             // Release all resources
             renderTargetView.Dispose();
             d2dRenderTarget.Dispose();
@@ -129,7 +134,7 @@ namespace Calabasas
             TextFormat.Dispose();
         }
 
-        private void RenderCallback()
+        private void OnRenderCallback()
         {
             d2dRenderTarget.BeginDraw();
             d2dRenderTarget.Clear(Color.Black);
@@ -147,9 +152,14 @@ namespace Calabasas
             swapChain.Present(0, PresentFlags.None);
         }
 
+        private void OnFaceChanged(object sender, System.Drawing.PointF[] points)
+        {
+            this.Draw(points);
+        }
+
         private void OnRenderFormKeyPress(object sender, System.Windows.Forms.KeyPressEventArgs e)
         {
-            throw new NotImplementedException();
+            // TODO: Handle keystrokes.
         }
 
         /*

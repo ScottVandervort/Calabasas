@@ -5,28 +5,34 @@ using System.Collections.Generic;
 
 namespace Calabasas
 {
-    public class Camera
+    public class FaceCamera : IFaceCamera
     {
+        public event EventHandler<System.Drawing.PointF[]> OnFaceChanged;
+        public event EventHandler OnTrackingFace;
+
         private readonly KinectSensorChooser sensorChooser = new KinectSensorChooser();
-        private readonly Dictionary<int, PumpkinFaceTracker> trackedSkeletons = new Dictionary<int, PumpkinFaceTracker>();
+        private readonly Dictionary<int, FaceTracker> trackedSkeletons = new Dictionary<int, FaceTracker>();
         private DepthImageFormat depthImageFormat = DepthImageFormat.Undefined;
         private short[] depthImage;
         private Skeleton[] skeletonData;
         private ColorImageFormat colorImageFormat = ColorImageFormat.Undefined;
         private byte[] colorImage;
         private const uint MaxMissedFrames = 100;
-        private PumpkinFaceRenderer pumpkinFaceRenderer;
 
-        public Camera (PumpkinFaceRenderer pumpkinFaceRenderer)
-        {
-            this.pumpkinFaceRenderer = pumpkinFaceRenderer;
-        }
+        public FaceCamera ()
+        {}
 
-        public void Run ()
+        public void Start ()
         {
             sensorChooser.KinectChanged += SensorChooser_KinectChanged;
-
             sensorChooser.Start();
+        }
+
+        public void Stop()
+        {
+            ResetFaceTracking();
+            sensorChooser.KinectChanged -= SensorChooser_KinectChanged;
+            sensorChooser.Stop();
         }
 
         private void SensorChooser_KinectChanged(object sender, KinectChangedEventArgs e)
@@ -147,11 +153,14 @@ namespace Calabasas
                         // We want keep a record of any skeleton, tracked or untracked.
                         if (!trackedSkeletons.ContainsKey(skeleton.TrackingId))
                         {
-                            trackedSkeletons.Add(skeleton.TrackingId, new PumpkinFaceTracker(pumpkinFaceRenderer));
+                            FaceTracker pumpkinFaceTracker = new FaceTracker();
+                            pumpkinFaceTracker.OnFaceChanged += PumpkinFaceTrackerOnFaceChanged;
+                            
+                            trackedSkeletons.Add(skeleton.TrackingId, pumpkinFaceTracker);
                         }
 
                         // Give each tracker the upated frame.
-                        PumpkinFaceTracker skeletonFaceTracker;
+                        FaceTracker skeletonFaceTracker;
                         if (trackedSkeletons.TryGetValue(skeleton.TrackingId, out skeletonFaceTracker))
                         {
                             skeletonFaceTracker.OnFrameReady(sensorChooser.Kinect, colorImageFormat, colorImage, depthImageFormat, depthImage, skeleton);
@@ -183,6 +192,12 @@ namespace Calabasas
             }
         }
 
+        void PumpkinFaceTrackerOnFaceChanged(object sender, System.Drawing.PointF[] e)
+        {
+            if (this.OnFaceChanged != null)
+                this.OnFaceChanged(sender,e);
+        }
+
         private void RemoveOldTrackers(int currentFrameNumber)
         {
             var trackersToRemove = new List<int>();
@@ -205,7 +220,9 @@ namespace Calabasas
 
         private void RemoveTracker(int trackingId)
         {
-            trackedSkeletons[trackingId].Dispose();
+            FaceTracker pumpkinFaceTracker = trackedSkeletons[trackingId];
+            pumpkinFaceTracker.OnFaceChanged -= PumpkinFaceTrackerOnFaceChanged;
+            pumpkinFaceTracker.Dispose();
             trackedSkeletons.Remove(trackingId);
         }
 

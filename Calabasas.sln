@@ -5,7 +5,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calabasas", "Calabasas\Cala
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calabasas.PumpkinFaceRenderer", "Calabasas.PumpkinFaceRenderer\Calabasas.PumpkinFaceRenderer.csproj", "{E8048044-5FB9-4D58-A7E9-B67545B660E9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calabasas.PumpkinFaceTracker", "Calabasas.PumpkinFaceTracker\Calabasas.PumpkinFaceTracker.csproj", "{4D64F9B8-0872-4747-BFEB-947D497C2656}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calabasas.FaceTracker", "Calabasas.FaceTracker\Calabasas.FaceTracker.csproj", "{4D64F9B8-0872-4747-BFEB-947D497C2656}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calabasas.Common", "Calabasas.Common\Calabasas.Common.csproj", "{7A02D461-468E-4EE7-85EF-85782C5720DA}"
 EndProject

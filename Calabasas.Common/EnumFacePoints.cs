@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Calabasas.Common
 {
-    public enum PumpkinFacePoints
+    public enum FacePoints
     {        
         TopSkull = 0,
 
