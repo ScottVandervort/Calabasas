@@ -176,6 +176,18 @@ Day 15 - Direct2D/SharpDx supports matrix transformations
 	I am a bit rusty so need to figure out how to go about doing this (again).
 
 
+Day 16 - Solution Re-org
+-------------------------------------------
+
+	Changed PumpkinFaceTracker to FaceTracker. Renderer now just listens to events broadcast from FaceTracer (i.e. it is now just a datasource). "Morphing" of vertices to a jack-o-lantern will now be done entirely in Renderer. This is because the renderer owns the windows form, keyboard/mouse events, etc...
+	
+	Created a new face chart in Gimp with color-coded points that map to Kinnect FaceTracker indices. Microsoft did a real BAD job of this in the FeaturePoint enum that shipped with the xample code - it is missing a lot of key points.
+	
+	Need to ...
+		1) Finish map.
+		2) Figure out how to draw lines in Renderer.
+		3) Draw each face component independently and verify mappings.
+	
 =======================================
 
 Stuff to do ......
@@ -196,7 +208,7 @@ Stuff to do ......
 					[ ] Allow key press to toggle between labeled points, lines, and both.
 				[ ] Render points as polygons.
 
-[ ] Renderer should accept Tracker as an argument; Renderer owns the Form and as such is the only one that can detect keyboard input; Render can display Kinnect status while loading,
+[X] Renderer should accept Tracker as an argument; Renderer owns the Form and as such is the only one that can detect keyboard input; Render can display Kinnect status while loading,
 				
 [ ] Add Log4Net
 	[ ] Log Kinnect status.
