@@ -188,7 +188,8 @@ Day 16 - Solution Re-org
 		2) Figure out how to draw lines in Renderer.
 		3) Draw each face component independently and verify mappings.
 		
-Day 17 - 
+Day 17 - Researching how to draw polygons
+-------------------------------------------
 
 	Found some more examples on how to render polygons and gradients using DirectX 2D
 	
@@ -198,15 +199,12 @@ Day 17 -
 
 	Also, I think I can use a radial gradient to fill the facial shapes. I am hoping I can center the gradient at the screen center (i.e., the "candle" backlighting the face).
 		
-Day 18 - Looking Ahead
+Day 18 - How to reset transformation
+-------------------------------------------
 
 	I am going to need a computer, the Kinnect, a webcam (for watching/listening to the audience), a speaker (for talking to the audience), and a small projector. The computer is going to need to be relatively close. 
 
 	You can save / restore changes to the rendering target by using SaveDrawingState() and RestoreDrawingState(). This resets andthing applied to the render target - such as transformattions.
-
-	
-
-
 
 
 =======================================
