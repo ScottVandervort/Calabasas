@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Qualcomm Incorporated")]
 [assembly: AssemblyProduct("Calabasas.Common")]
-[assembly: AssemblyCopyright("Copyright © Qualcomm Incorporated 2016")]
+[assembly: AssemblyCopyright("Copyright © 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
