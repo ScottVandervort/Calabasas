@@ -71,6 +71,8 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions.cs" />
+    <Compile Include="FramesPerSecond.cs" />
     <Compile Include="PumpkinFaceRenderer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VertexPositionColor.cs" />
