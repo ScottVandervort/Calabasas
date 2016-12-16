@@ -1,86 +1,43 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Calabasas.Common
+﻿namespace Calabasas.Common
 {
-    public enum FacePoints
+    public enum FacePoints : int
     {        
-        TopSkull = 0,
+        LeftEyebrow0 = 15,
+        LeftEyebrow1 = 16,
+        LeftEyebrow2 = 17,
+        LeftEyebrow3 = 18,
 
-        LeftEyebrowTop = 16,
-        LeftEyebrowRight = 17,
-        LeftEyebrowLeft = 15,
+        RightEyebrow0 = 50,
+        RightEyebrow1 = 49,
+        RightEyebrow2 = 48,
+        RightEyebrow3 = 51,
 
-        RightEyebrowTop = 49,
-        RightEyebrowRight = 48,
-        RightEyebrowLeft = 50,
+        Nose0 = 26,
+        Nose1 = 94,
+        Nose2 = 59,
 
-        NoseTop = 94,
-        NoseBottomRight = 59,
-        NoseBottomLeft = 26,
+        Mouth0 = 31,
+        Mouth1 = 64,
+        Mouth2 = 86,
+        Mouth3 = 41,
+        Mouth4 = 85,
 
-        MouthTop = 87,
-        MouthTopRight = 82,
-        MouthRight = 89,
-        MouthBottomRight = 84,
-        MouthBottom = 40,
-        MouthBottomLeft = 83,
-        MouthLeft = 88,
-        MouthTopLeft = 81,
+        LeftEye0 = 101,
+        LeftEye1 = 19,
+        LeftEye2 = 109,
 
+        RightEye0 = 110,
+        RightEye1 = 52,
+        RightEye2 = 102,
 
+        RightPupil0 = 73,
+        RightPupil1 = 69,
+        RightPupil2 = 70,
+        RightPupil3 = 74,
 
-
-
-
-
-
-        AboveMidUpperRightEyelid = 19,
-        OuterCornerOfRightEye = 20,
-        MiddleTopRightEyelid = 21,
-        MiddleBottomRightEyelid = 22,
-        InnerCornerRightEye = 23,
-        UnderMidBottomRightEyelid = 24,
-        AboveThreeFourthRightEyelid = 95,
-        AboveThreeFourthLeftEyelid = 96,
-        ThreeFourthTopRightEyelid = 97,
-        ThreeFourthTopLeftEyelid = 98,
-        ThreeFourthBottomRightEyelid = 99,
-        ThreeFourthBottomLeftEyelid = 100,
-        BelowThreeFourthRightEyelid = 101,
-        BelowThreeFourthLeftEyelid = 102,
-        AboveOneFourthRightEyelid = 103,
-        AboveOneFourthLeftEyelid = 104,
-        OneFourthTopRightEyelid = 105,
-        OneFourthTopLeftEyelid = 106,
-        OneFourthBottomRightEyelid = 107,
-        OneFourthBottomLeftEyelid = 108,
-        AboveMidUpperLeftEyelid = 52,
-        OuterCornerOfLeftEye = 53,
-        MiddleTopLeftEyelid = 54,
-        MiddleBottomLeftEyelid = 55,
-        InnerCornerLeftEye = 56,
-        UnderMidBottomLeftEyelid = 57,
-
-        OuterTopRightPupil = 67,
-        OuterBottomRightPupil = 68,
-        InnerTopRightPupil = 71,
-        InnerBottomRightPupil = 72,
-
-        OuterTopLeftPupil = 69,
-        OuterBottomLeftPupil = 70,
-        InnerTopLeftPupil = 73,
-        InnerBottomLeftPupil = 74,
-
-
-
-
-
-
-
-
+        LeftPupil0 = 67,
+        LeftPupil1 = 71,
+        LeftPupil2 = 72,
+        LeftPupil3 = 68
     }
 }

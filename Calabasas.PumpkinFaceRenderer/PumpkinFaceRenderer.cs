@@ -7,6 +7,7 @@ using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using SharpDX.Windows;
 using SharpDX.DirectWrite;
+using Calabasas.Common;
 
 namespace Calabasas
 {
@@ -14,6 +15,7 @@ namespace Calabasas
     {
         private const int Width = 1280;
         private const int Height = 720;
+        private const int ExpectedFacePoints = 119;
 
         IFaceCamera faceCamera;
 
@@ -33,6 +35,15 @@ namespace Calabasas
 
         private Vector2[] points = { };
         private Vector2 center = new Vector2(0, 0);
+
+        private Vector2[] leftEyebrow = { };
+        private Vector2[] rightEyebrow = { };
+        private Vector2[] mouth = { };
+        private Vector2[] nose = { };
+        private Vector2[] leftEye = { };
+        private Vector2[] leftPupil = { };
+        private Vector2[] rightEye = { };
+        private Vector2[] rightPupil = { };
 
         public TextFormat TextFormat { get; private set; }
         public SolidColorBrush SceneColorBrush { get; private set; }
@@ -118,6 +129,9 @@ namespace Calabasas
 
             this.points = newPoints;
             this.center = new Vector2(totalX / points.Length, totalY / points.Length);
+
+            if (this.IsDrawingFace())
+                this.GenerateFace();
         }
 
         public void Dispose()
@@ -141,6 +155,69 @@ namespace Calabasas
             drawingStateBlock.Dispose();
         }
 
+        private bool IsDrawingFace()
+        {
+            return (this.points != null && this.points.Length == ExpectedFacePoints);
+        }
+
+        private void GenerateFace()
+        {
+            this.leftEyebrow = new Vector2[] {
+                points[(int)FacePoints.LeftEyebrow0],
+                points[(int)FacePoints.LeftEyebrow1],
+                points[(int)FacePoints.LeftEyebrow2],
+                points[(int)FacePoints.LeftEyebrow3]
+            };
+
+            this.rightEyebrow = new Vector2[] {
+                points[(int)FacePoints.RightEyebrow0],
+                points[(int)FacePoints.RightEyebrow1],
+                points[(int)FacePoints.RightEyebrow2],
+                points[(int)FacePoints.RightEyebrow3]
+            };
+
+            this.nose = new Vector2[] {
+                points[(int)FacePoints.Nose0],
+                points[(int)FacePoints.Nose1],
+                points[(int)FacePoints.Nose2],
+            };
+
+            this.mouth = new Vector2[] {
+                points[(int)FacePoints.Mouth0],
+                points[(int)FacePoints.Mouth1],
+                points[(int)FacePoints.Mouth2],
+                points[(int)FacePoints.Mouth3],
+                points[(int)FacePoints.Mouth4]
+            };
+
+            this.leftEye = new Vector2[] {
+                points[(int)FacePoints.LeftEye0],
+                points[(int)FacePoints.LeftEye1],
+                points[(int)FacePoints.LeftEye2]
+            };
+
+            this.rightEye = new Vector2[] {
+                points[(int)FacePoints.RightEye0],
+                points[(int)FacePoints.RightEye1],
+                points[(int)FacePoints.RightEye2]
+            };
+
+            this.rightPupil = new Vector2[] {
+                points[(int)FacePoints.RightPupil0],
+                points[(int)FacePoints.RightPupil1],
+                points[(int)FacePoints.RightPupil2],
+                points[(int)FacePoints.RightPupil3]
+            };
+
+            this.leftPupil = new Vector2[] {
+                points[(int)FacePoints.LeftPupil0],
+                points[(int)FacePoints.LeftPupil1],
+                points[(int)FacePoints.LeftPupil2],
+                points[(int)FacePoints.LeftPupil3]
+            };
+        }
+
+
         private void OnRenderCallback()
         {
             d2dRenderTarget.BeginDraw();
@@ -151,7 +228,21 @@ namespace Calabasas
 
             d2dRenderTarget.Transform = Matrix3x2.Translation(-center.X, -center.Y) * Matrix3x2.Scaling(3, 3) * Matrix3x2.Translation(Width / 2, Height / 2);
 
-            renderPolygon(points);
+            if (this.IsDrawingFace())
+            {
+                renderPolygon(this.leftEyebrow);
+                renderPolygon(this.leftEye);
+                renderPolygon(this.leftPupil);
+                renderPolygon(this.rightEyebrow);
+                renderPolygon(this.rightEye);
+                renderPolygon(this.rightPupil);
+                renderPolygon(this.mouth);
+                renderPolygon(this.nose);
+            }
+            else
+            {
+                renderPolygon(this.points);
+            }
 
             for (int pointIndex = 0; pointIndex < points.Length; pointIndex++)
             {
