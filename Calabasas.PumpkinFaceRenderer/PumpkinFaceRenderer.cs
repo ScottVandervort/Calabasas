@@ -15,7 +15,7 @@ namespace Calabasas
     {
         private const int Width = 1280;
         private const int Height = 720;
-        private const int ExpectedFacePoints = 119;
+        private const int ExpectedFacePoints = 121;
 
         IFaceCamera faceCamera;
 
@@ -180,6 +180,14 @@ namespace Calabasas
                 points[(int)FacePoints.Nose0],
                 points[(int)FacePoints.Nose1],
                 points[(int)FacePoints.Nose2],
+                points[(int)FacePoints.Nose3],
+                points[(int)FacePoints.Nose4],
+                points[(int)FacePoints.Nose5],
+                points[(int)FacePoints.Nose6],
+                points[(int)FacePoints.Nose7],
+                points[(int)FacePoints.Nose8],
+                points[(int)FacePoints.Nose9],
+                points[(int)FacePoints.Nose10]
             };
 
             this.mouth = new Vector2[] {
@@ -187,13 +195,21 @@ namespace Calabasas
                 points[(int)FacePoints.Mouth1],
                 points[(int)FacePoints.Mouth2],
                 points[(int)FacePoints.Mouth3],
-                points[(int)FacePoints.Mouth4]
+                points[(int)FacePoints.Mouth4],
+                points[(int)FacePoints.Mouth5],
+                points[(int)FacePoints.Mouth6]
             };
 
             this.leftEye = new Vector2[] {
                 points[(int)FacePoints.LeftEye0],
                 points[(int)FacePoints.LeftEye1],
-                points[(int)FacePoints.LeftEye2]
+                points[(int)FacePoints.LeftEye2],
+                points[(int)FacePoints.LeftEye3],
+                points[(int)FacePoints.LeftEye4],
+                points[(int)FacePoints.LeftEye5],
+                points[(int)FacePoints.LeftEye6],
+                points[(int)FacePoints.LeftEye7]
+
             };
 
             this.rightEye = new Vector2[] {
@@ -244,11 +260,11 @@ namespace Calabasas
                 renderPolygon(this.points);
             }
 
-            for (int pointIndex = 0; pointIndex < points.Length; pointIndex++)
-            {
-                renderPoint(points[pointIndex]);
-                renderText(points[pointIndex], pointIndex.ToString());
-            }
+            ////for (int pointIndex = 0; pointIndex < points.Length; pointIndex++)
+            ////{
+            ////    renderPoint(points[pointIndex]);
+            ////    renderText(points[pointIndex], pointIndex.ToString());
+            ////}
 
             d2dRenderTarget.RestoreDrawingState(drawingStateBlock);
 
