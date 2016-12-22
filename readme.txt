@@ -213,7 +213,14 @@ Day 19 - Finished the onorous task of mapping
 
 	FaceTracking toolkit provides only 71 in Microsoft.Kinect.Toolkit.FaceTracking.FeaturePoint - and the vergage of the enum values is very very cryptic.
 
+Day 20 - Time for a new sensor
+-------------------------------------------
 
+	This weekend I tested the project against Jodie and myself. Eye blinks weren't being picked up. Nose scrunches weren't being picked up. Iris movements weren't being picked up. Mouth movement detection was at best, subpar. Sigh. I was about ready to shit can the whole project until I staretd researching the XBox One Kinect Sensor. I watched videos feeds of simple projects. The new sensor is much much improved. I didn't go this route originally because of the cost ( roughly $100 for the sensor and Windows 10 adapter used ). However, after thinking about it and talking it over with Jodie I am going to splurge and give it one final shot.
+	
+	I have the new sensor on order from Ebay. Let's see what happens next...
+	
+	
 
 
 
