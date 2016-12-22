@@ -11,7 +11,7 @@ using Calabasas.Common;
 
 namespace Calabasas
 {
-    public class PumpkinFaceRenderer : IDisposable
+    public class PumpkinFaceRenderer2D : IPumpkinFaceRenderer<System.Drawing.PointF>
     {
         private const int Width = 1280;
         private const int Height = 720;
@@ -45,10 +45,10 @@ namespace Calabasas
         private Vector2[] rightEye = { };
         private Vector2[] rightPupil = { };
 
-        public TextFormat TextFormat { get; private set; }
-        public SolidColorBrush SceneColorBrush { get; private set; }
+        private TextFormat TextFormat { get; set; }
+        private SolidColorBrush SceneColorBrush { get; set; }
 
-        public PumpkinFaceRenderer(IFaceCamera faceCamera)
+        public PumpkinFaceRenderer2D (IFaceCamera faceCamera)
         {
             renderForm = new RenderForm("Calabasas");
 
@@ -107,7 +107,7 @@ namespace Calabasas
 
         public void Start()
         {
-            faceCamera.Start();
+            //faceCamera.Start();
 
             // Start the render loop
             RenderLoop.Run(renderForm, OnRenderCallback);
@@ -232,7 +232,6 @@ namespace Calabasas
                 points[(int)FacePoints.LeftPupil3]
             };
         }
-
 
         private void OnRenderCallback()
         {

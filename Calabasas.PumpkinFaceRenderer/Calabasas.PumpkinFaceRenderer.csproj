@@ -73,8 +73,9 @@
   <ItemGroup>
     <Compile Include="Extensions.cs" />
     <Compile Include="FramesPerSecond.cs" />
-    <Compile Include="PumpkinFaceRenderer.cs" />
+    <Compile Include="PumpkinFaceRenderer2D.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PumpkinFaceRenderer3D.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
