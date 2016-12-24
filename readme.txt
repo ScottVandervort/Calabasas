@@ -220,8 +220,14 @@ Day 20 - Time for a new sensor
 	
 	I have the new sensor on order from Ebay. Let's see what happens next...
 	
-	
+Day 21 - Migrating from Direct2D to Direct3D	
+-------------------------------------------
 
+	While I am waiting for my new Kinnect 2.0 to arrive I am working on enhancing the renderer so that it uses Direct3D to render facial features and Direct2D to render text and ui stuff.
+	
+	Kinnect 1.0 offers facial points in both 3D and 2D. Not sure if Kinnect 2.0 does the same. 
+
+	Migrating to 3D rendering will theoretically offer better shading, too. At some point I would like render the facial shapes with a flickering candle in the background.
 
 
 =======================================

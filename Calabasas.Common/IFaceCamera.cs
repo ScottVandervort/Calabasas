@@ -1,16 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Calabasas
 {
-    public interface IFaceCamera
+    public interface IFaceCamera<VectorType>
     {
         void Start();
         void Stop();
-        event EventHandler<System.Drawing.PointF[]> OnFaceChanged; 
+        event EventHandler<VectorType[]> OnFaceChanged; 
         event EventHandler OnTrackingFace;
     }
 }

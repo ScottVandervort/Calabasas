@@ -11,17 +11,10 @@ using Calabasas.Common;
 
 namespace Calabasas
 {
-    public class PumpkinFaceRenderer2D : IPumpkinFaceRenderer<System.Drawing.PointF>
+    public class PumpkinFaceRenderer2D : PumpkinFaceRenderer<System.Drawing.PointF>
     {
-        private const int Width = 1280;
-        private const int Height = 720;
         private const int ExpectedFacePoints = 121;
 
-        IFaceCamera faceCamera;
-
-        FramesPerSecond framesPerSecond;
-
-        private RenderForm renderForm;
         private SwapChainDescription swapChainDesc;
         private SharpDX.Direct3D11.Device device;
         private SwapChain swapChain;
@@ -48,22 +41,14 @@ namespace Calabasas
         private TextFormat TextFormat { get; set; }
         private SolidColorBrush SceneColorBrush { get; set; }
 
-        public PumpkinFaceRenderer2D (IFaceCamera faceCamera)
-        {
-            renderForm = new RenderForm("Calabasas");
-
-            this.faceCamera = faceCamera;
-
-            renderForm.KeyPress += OnRenderFormKeyPress;
-
-            this.faceCamera.OnFaceChanged += OnFaceChanged;
+        public PumpkinFaceRenderer2D (IFaceCamera<System.Drawing.PointF> faceCamera) : base(faceCamera)
+        {          
 
             // SwapChain description
             swapChainDesc = new SwapChainDescription()
             {
                 BufferCount = 1,
-                ModeDescription = new ModeDescription(Width, Height,
-                                                       new Rational(60, 1), Format.R8G8B8A8_UNorm),
+                ModeDescription = new ModeDescription(Width, Height, new Rational(60, 1), Format.R8G8B8A8_UNorm),
                 IsWindowed = true,
                 OutputHandle = renderForm.Handle,
                 SampleDescription = new SampleDescription(1, 0),
@@ -72,7 +57,13 @@ namespace Calabasas
             };
 
             // Create Device and SwapChain
-            SharpDX.Direct3D11.Device.CreateWithSwapChain(DriverType.Hardware, DeviceCreationFlags.BgraSupport, new SharpDX.Direct3D.FeatureLevel[] { SharpDX.Direct3D.FeatureLevel.Level_10_0 }, swapChainDesc, out device, out swapChain);
+            SharpDX.Direct3D11.Device.CreateWithSwapChain(
+                DriverType.Hardware, 
+                DeviceCreationFlags.BgraSupport, 
+                new SharpDX.Direct3D.FeatureLevel[] { SharpDX.Direct3D.FeatureLevel.Level_10_0 }, 
+                swapChainDesc, 
+                out device, 
+                out swapChain);
 
             d2dFactory = new SharpDX.Direct2D1.Factory();
             dwFactory = new SharpDX.DirectWrite.Factory();
@@ -101,23 +92,13 @@ namespace Calabasas
             SceneColorBrush = new SolidColorBrush(d2dRenderTarget, Color.White);
 
             drawingStateBlock = new DrawingStateBlock(d2dFactory);
-
-            framesPerSecond = new FramesPerSecond();
         }
 
-        public void Start()
-        {
-            //faceCamera.Start();
-
-            // Start the render loop
-            RenderLoop.Run(renderForm, OnRenderCallback);
-        }
-
-        public void Draw(System.Drawing.PointF[] points)
+        override public void Draw(System.Drawing.PointF[] points)
         {
             Vector2[] newPoints = new Vector2[points.Length];
-            float totalX = 0,
-                    totalY = 0;
+            float totalX = 0;
+            float totalY = 0;
 
             // Convert PointF to Vector2 and determine center.
             for (int pointIndex = 0; pointIndex < points.Length; pointIndex++)
@@ -134,9 +115,9 @@ namespace Calabasas
                 this.GenerateFace();
         }
 
-        public void Dispose()
+        override public void Dispose()
         {
-            this.faceCamera.Stop();
+            base.Dispose();
 
             // Release all resources
             drawingStateBlock.Dispose();
@@ -233,7 +214,7 @@ namespace Calabasas
             };
         }
 
-        private void OnRenderCallback()
+        override protected void OnRenderCallback()
         {
             d2dRenderTarget.BeginDraw();
 
@@ -274,7 +255,7 @@ namespace Calabasas
 
             swapChain.Present(0, PresentFlags.None);
 
-            framesPerSecond.Frame();
+            base.OnRenderCallback();
         }
 
         private void renderPoint(SharpDX.Vector2 point)
@@ -317,24 +298,10 @@ namespace Calabasas
                         Color penColor = Color.DarkOrange;
                         SolidColorBrush penBrush = new SolidColorBrush(d2dRenderTarget, new SharpDX.Color(penColor.R, penColor.G, penColor.B));
 
-
-                        //RadialGradientBrush radialGradientBrush = new RadialGradientBrush(d2dRenderTarget, new RadialGradientBrushProperties()
-
-
                         d2dRenderTarget.DrawGeometry(pathGeometery, penBrush);
                     }
                 }
             }
-        }
-
-        private void OnFaceChanged(object sender, System.Drawing.PointF[] points)
-        {
-            this.Draw(points);
-        }
-
-        private void OnRenderFormKeyPress(object sender, System.Windows.Forms.KeyPressEventArgs e)
-        {
-            // TODO: Handle keystrokes.
         }
     }
 

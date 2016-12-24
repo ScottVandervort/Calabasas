@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Calabasas
 {
-    public class FaceCamera : IFaceCamera
+    public class FaceCamera : IFaceCamera<System.Drawing.PointF>
     {
         public event EventHandler<System.Drawing.PointF[]> OnFaceChanged;
         public event EventHandler OnTrackingFace;

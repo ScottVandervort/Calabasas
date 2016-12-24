@@ -73,13 +73,21 @@
   <ItemGroup>
     <Compile Include="Extensions.cs" />
     <Compile Include="FramesPerSecond.cs" />
+    <Compile Include="PumpkinFaceRenderer.cs" />
     <Compile Include="PumpkinFaceRenderer2D.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PumpkinFaceRenderer3D.cs" />
+    <Compile Include="VertexPositionColor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+    <None Include="pixelShader.hlsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="vertexShader.hlsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Calabasas.Common\Calabasas.Common.csproj">
