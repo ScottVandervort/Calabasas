@@ -1,236 +1,198 @@
 ﻿using Microsoft.Kinect;
-using Microsoft.Kinect.Toolkit;
+using Microsoft.Kinect.Face;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Drawing;
+
+
+// TODO: How to get happy, sad, wearing glasses, etc...
+// https://msdn.microsoft.com/en-us/library/dn782034.aspx#ID4E3
+//https://github.com/Vangos
 
 namespace Calabasas
 {
     public class FaceCamera : IFaceCamera<System.Drawing.PointF>
     {
-        public event EventHandler<System.Drawing.PointF[]> OnFaceChanged;
-        public event EventHandler OnTrackingFace;
+        private KinectSensor _sensor = null;
+        private BodyFrameSource _bodySource = null;
+        private BodyFrameReader _bodyReader = null;
 
-        private readonly KinectSensorChooser sensorChooser = new KinectSensorChooser();
-        private readonly Dictionary<int, FaceTracker> trackedSkeletons = new Dictionary<int, FaceTracker>();
-        private DepthImageFormat depthImageFormat = DepthImageFormat.Undefined;
-        private short[] depthImage;
-        private Skeleton[] skeletonData;
-        private ColorImageFormat colorImageFormat = ColorImageFormat.Undefined;
-        private byte[] colorImage;
-        private const uint MaxMissedFrames = 100;
+        private HighDefinitionFaceFrameSource _faceSourceHighDef = null;
+        private HighDefinitionFaceFrameReader _faceReaderHighDef = null;
 
-        public FaceCamera ()
-        {}
+        private FaceFrameSource _faceSource = null;
+        private FaceFrameReader _faceReader = null;
 
-        public void Start ()
+        private FaceAlignment _faceAlignment = null;
+        private FaceModel _faceModel = null;
+
+        private FaceState _faceState = new FaceState();
+
+        public event EventHandler<FaceState> OnFaceChanged;
+        public event EventHandler<bool> OnTrackingFace;
+        
+        void IFaceCamera<System.Drawing.PointF>.Start()
         {
-            sensorChooser.KinectChanged += SensorChooser_KinectChanged;
-            sensorChooser.Start();
-        }
+            _sensor = KinectSensor.GetDefault();
 
-        public void Stop()
-        {
-            ResetFaceTracking();
-            sensorChooser.KinectChanged -= SensorChooser_KinectChanged;
-            sensorChooser.Stop();
-        }
-
-        private void SensorChooser_KinectChanged(object sender, KinectChangedEventArgs e)
-        {
-            KinectSensor oldSensor = e.OldSensor;
-            KinectSensor newSensor = e.NewSensor;
-
-            if (oldSensor != null)
+            if (_sensor != null)
             {
-                oldSensor.AllFramesReady -= KinectSensorOnAllFramesReady;
-                oldSensor.ColorStream.Disable();
-                oldSensor.DepthStream.Disable();
-                oldSensor.DepthStream.Range = DepthRange.Default;
-                oldSensor.SkeletonStream.Disable();
-                oldSensor.SkeletonStream.EnableTrackingInNearRange = false;
-                oldSensor.SkeletonStream.TrackingMode = SkeletonTrackingMode.Default;
 
-                ResetFaceTracking();
-            }
+                _sensor.IsAvailableChanged += OnKinectSensorChanged;
+                _bodySource = _sensor.BodyFrameSource;
+                _bodyReader = _bodySource.OpenReader();
 
-            if (newSensor != null)
-            {
-                try
-                {
-                    newSensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
-                    newSensor.DepthStream.Enable(DepthImageFormat.Resolution320x240Fps30);
-                    try
-                    {
-                        // This will throw on non Kinect For Windows devices.
-                        newSensor.DepthStream.Range = DepthRange.Near;
-                        newSensor.SkeletonStream.EnableTrackingInNearRange = true;
-                    }
-                    catch (InvalidOperationException)
-                    {
-                        newSensor.DepthStream.Range = DepthRange.Default;
-                        newSensor.SkeletonStream.EnableTrackingInNearRange = false;
-                    }
+                _bodyReader.FrameArrived += OnBodyReaderFrameArrived;
 
-                    newSensor.SkeletonStream.TrackingMode = SkeletonTrackingMode.Seated;
-                    newSensor.SkeletonStream.Enable();
-                    newSensor.AllFramesReady += KinectSensorOnAllFramesReady;
-                }
-                catch (InvalidOperationException)
-                {
-                    // This exception can be thrown when we are trying to
-                    // enable streams on a device that has gone away.  This
-                    // can occur, say, in app shutdown scenarios when the sensor
-                    // goes away between the time it changed status and the
-                    // time we get the sensor changed notification.
-                    //
-                    // Behavior here is to just eat the exception and assume
-                    // another notification will come along if a sensor
-                    // comes back.
-                }
+                _faceSourceHighDef = new HighDefinitionFaceFrameSource(_sensor);
+                _faceReaderHighDef = _faceSourceHighDef.OpenReader();
+                _faceReaderHighDef.FrameArrived += OnFaceReaderHighDefFrameArrived;
+
+                _faceSource = new FaceFrameSource(_sensor, 0, FaceFrameFeatures.BoundingBoxInColorSpace |
+                                                              FaceFrameFeatures.Glasses |
+                                                              FaceFrameFeatures.Happy |
+                                                              FaceFrameFeatures.LeftEyeClosed |
+                                                              FaceFrameFeatures.MouthOpen |
+                                                              FaceFrameFeatures.MouthMoved |
+                                                              FaceFrameFeatures.RightEyeClosed);
+                _faceReader = _faceSource.OpenReader();
+                _faceReader.FrameArrived += OnFaceReaderFrameArrived;
+
+                _faceModel = new FaceModel();
+                _faceAlignment = new FaceAlignment();
+
+                _sensor.Open();
             }
         }
 
-        private void KinectSensorOnAllFramesReady(object sender, AllFramesReadyEventArgs e)
+        private void OnFaceReaderFrameArrived(object sender, FaceFrameArrivedEventArgs e)
         {
-            ColorImageFrame colorImageFrame = null;
-            DepthImageFrame depthImageFrame = null;
-            SkeletonFrame skeletonFrame = null;
-
-            try
+            using (var frame = e.FrameReference.AcquireFrame())
             {
-                colorImageFrame = e.OpenColorImageFrame();
-                depthImageFrame = e.OpenDepthImageFrame();
-                skeletonFrame = e.OpenSkeletonFrame();
-
-                if (colorImageFrame == null || depthImageFrame == null || skeletonFrame == null)
+                if (frame != null)
                 {
-                    return;
-                }
+                    FaceFrameResult result = frame.FaceFrameResult;
 
-                // Check for image format changes.  The FaceTracker doesn't
-                // deal with that so we need to reset.
-                if (depthImageFormat != depthImageFrame.Format)
-                {
-                    ResetFaceTracking();
-                    depthImage = null;
-                    depthImageFormat = depthImageFrame.Format;
-                }
-
-                if (colorImageFormat != colorImageFrame.Format)
-                {
-                    ResetFaceTracking();
-                    colorImage = null;
-                    colorImageFormat = colorImageFrame.Format;
-                }
-
-                // Create any buffers to store copies of the data we work with
-                if (depthImage == null)
-                {
-                    depthImage = new short[depthImageFrame.PixelDataLength];
-                }
-
-                if (colorImage == null)
-                {
-                    colorImage = new byte[colorImageFrame.PixelDataLength];
-                }
-
-                // Get the skeleton information
-                if (skeletonData == null || skeletonData.Length != skeletonFrame.SkeletonArrayLength)
-                {
-                    skeletonData = new Skeleton[skeletonFrame.SkeletonArrayLength];
-                }
-
-                colorImageFrame.CopyPixelDataTo(colorImage);
-                depthImageFrame.CopyPixelDataTo(depthImage);
-                skeletonFrame.CopySkeletonDataTo(skeletonData);
-
-                // Update the list of trackers and the trackers with the current frame information
-                foreach (Skeleton skeleton in skeletonData)
-                {
-                    if (skeleton.TrackingState == SkeletonTrackingState.Tracked
-                        || skeleton.TrackingState == SkeletonTrackingState.PositionOnly)
+                    if (result != null)
                     {
-                        // We want keep a record of any skeleton, tracked or untracked.
-                        if (!trackedSkeletons.ContainsKey(skeleton.TrackingId))
+                        _faceState.BoundingBox = new System.Drawing.Rectangle(
+                                            result.FaceBoundingBoxInColorSpace.Left,
+                                            result.FaceBoundingBoxInColorSpace.Top,
+                                            result.FaceBoundingBoxInColorSpace.Right - result.FaceBoundingBoxInColorSpace.Left,
+                                            result.FaceBoundingBoxInColorSpace.Bottom - result.FaceBoundingBoxInColorSpace.Top);
+                        _faceState.IsHappy = result.FaceProperties[FaceProperty.Happy] == DetectionResult.Yes;
+                        _faceState.IsLeftEyeClosed = result.FaceProperties[FaceProperty.LeftEyeClosed] == DetectionResult.Yes;
+                        _faceState.IsRightEyeClosed = result.FaceProperties[FaceProperty.RightEyeClosed] == DetectionResult.Yes;
+                        _faceState.IsMouthMoved = result.FaceProperties[FaceProperty.MouthMoved] == DetectionResult.Yes;
+                        _faceState.IsMouthOpen = result.FaceProperties[FaceProperty.MouthOpen] == DetectionResult.Yes;
+                        _faceState.IsWearingGlasses = result.FaceProperties[FaceProperty.WearingGlasses] == DetectionResult.Yes;
+
+                        if (this.OnFaceChanged != null)
+                            this.OnFaceChanged(sender, _faceState);
+                    }
+                }              
+            }
+        }
+
+        private void OnKinectSensorChanged(object sender, IsAvailableChangedEventArgs e)
+        {
+            if (this.OnTrackingFace != null)           
+                this.OnTrackingFace(sender, e.IsAvailable);            
+        }
+
+        private void OnFaceReaderHighDefFrameArrived(object sender, HighDefinitionFaceFrameArrivedEventArgs e)
+        {
+            using (HighDefinitionFaceFrame frame = e.FrameReference.AcquireFrame())
+            {
+                if (frame != null && frame.IsFaceTracked)
+                {
+                    frame.GetAndRefreshFaceAlignmentResult(_faceAlignment);                                      
+
+                    if (_faceModel != null && _sensor != null)
+                    {
+                        CameraSpacePoint[] cameraSpacePoints = _faceModel.CalculateVerticesForAlignment(_faceAlignment).ToArray();
+                        DepthSpacePoint[] depthSpacePoints = new DepthSpacePoint[cameraSpacePoints.Length];
+
+                        if (cameraSpacePoints.Length > 0)
+                            _sensor.CoordinateMapper.MapCameraPointsToDepthSpace(cameraSpacePoints, depthSpacePoints);
+
+                        _faceState.Points = depthSpacePoints.ConvertToPointF();
+
+                        if (this.OnFaceChanged != null)
+                            this.OnFaceChanged(sender, _faceState);
+                    }
+                }
+            }
+        }
+
+        private void OnBodyReaderFrameArrived(object sender, BodyFrameArrivedEventArgs e)
+        {
+            using (var frame = e.FrameReference.AcquireFrame())
+            {              
+
+                if (frame != null)
+                {
+                    Body[] bodies = new Body[frame.BodyCount];
+                    frame.GetAndRefreshBodyData(bodies);
+
+                    Body body = bodies.Where(b => b.IsTracked).FirstOrDefault();                  
+
+                    if (!_faceSourceHighDef.IsTrackingIdValid)
+                    {
+                        if (body != null)
                         {
-                            FaceTracker pumpkinFaceTracker = new FaceTracker();
-                            pumpkinFaceTracker.OnFaceChanged += PumpkinFaceTrackerOnFaceChanged;
-                            
-                            trackedSkeletons.Add(skeleton.TrackingId, pumpkinFaceTracker);
+                            _faceSourceHighDef.TrackingId = body.TrackingId;
                         }
+                    }
 
-                        // Give each tracker the upated frame.
-                        FaceTracker skeletonFaceTracker;
-                        if (trackedSkeletons.TryGetValue(skeleton.TrackingId, out skeletonFaceTracker))
+                    if (!_faceSource.IsTrackingIdValid)
+                    {
+                        if (body != null)
                         {
-                            skeletonFaceTracker.OnFrameReady(sensorChooser.Kinect, colorImageFormat, colorImage, depthImageFormat, depthImage, skeleton);
-                            skeletonFaceTracker.LastTrackedFrame = skeletonFrame.FrameNumber;
+                            _faceSource.TrackingId = body.TrackingId;
                         }
                     }
                 }
-
-                RemoveOldTrackers(skeletonFrame.FrameNumber);
-
-                //InvalidateVisual();
-            }
-            finally
-            {
-                if (colorImageFrame != null)
-                {
-                    colorImageFrame.Dispose();
-                }
-
-                if (depthImageFrame != null)
-                {
-                    depthImageFrame.Dispose();
-                }
-
-                if (skeletonFrame != null)
-                {
-                    skeletonFrame.Dispose();
-                }
             }
         }
 
-        void PumpkinFaceTrackerOnFaceChanged(object sender, System.Drawing.PointF[] e)
+        void IFaceCamera<System.Drawing.PointF>.Stop()
         {
-            if (this.OnFaceChanged != null)
-                this.OnFaceChanged(sender,e);
-        }
-
-        private void RemoveOldTrackers(int currentFrameNumber)
-        {
-            var trackersToRemove = new List<int>();
-
-            foreach (var tracker in trackedSkeletons)
+            if(_bodyReader != null)
             {
-                uint missedFrames = (uint)currentFrameNumber - (uint)tracker.Value.LastTrackedFrame;
-                if (missedFrames > MaxMissedFrames)
-                {
-                    // There have been too many frames since we last saw this skeleton
-                    trackersToRemove.Add(tracker.Key);
-                }
+                _bodyReader.Dispose();
+                _bodyReader = null;
             }
 
-            foreach (int trackingId in trackersToRemove)
+            if(_faceReader != null)
             {
-                RemoveTracker(trackingId);
+                _faceReader.Dispose();
+                _faceReader = null;
             }
-        }
 
-        private void RemoveTracker(int trackingId)
-        {
-            FaceTracker pumpkinFaceTracker = trackedSkeletons[trackingId];
-            pumpkinFaceTracker.OnFaceChanged -= PumpkinFaceTrackerOnFaceChanged;
-            pumpkinFaceTracker.Dispose();
-            trackedSkeletons.Remove(trackingId);
-        }
-
-        private void ResetFaceTracking()
-        {
-            foreach (int trackingId in new List<int>(trackedSkeletons.Keys))
+            if (_faceReaderHighDef != null)
             {
-                RemoveTracker(trackingId);
+                _faceReaderHighDef.Dispose();
+                _faceReaderHighDef = null;
+            }            
+
+            if(_faceSource != null)
+            {
+                _faceSource.Dispose();
+                _faceSource = null;
+            }
+
+            if (_sensor != null)
+            {
+                _sensor.Close();
+                _sensor = null;
+            }
+
+            if (_faceModel != null)
+            {
+                _faceModel.Dispose();
+                _faceModel = null;
             }
         }
     }

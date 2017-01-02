@@ -220,14 +220,36 @@ Day 20 - Time for a new sensor
 	
 	I have the new sensor on order from Ebay. Let's see what happens next...
 	
-Day 21 - Migrating from Direct2D to Direct3D	
+Day 21 - Testing new sensor	
 -------------------------------------------
 
-	While I am waiting for my new Kinnect 2.0 to arrive I am working on enhancing the renderer so that it uses Direct3D to render facial features and Direct2D to render text and ui stuff.
+	It works! Pretty well, actually.
 	
-	Kinnect 1.0 offers facial points in both 3D and 2D. Not sure if Kinnect 2.0 does the same. 
+	This guy has proved invaluable: https://github.com/Vangos
+	
+	There are two modes in Kinect Face Tracking 2.0 - normal and hi-def. Normal returns a bounding box and very rudimentary facial data. High-def returns about a thousand plotted points.
+	
+	The Kinnect 2.0 API is available through NuGet as well which will make distrubuting these thing much much easier.
+	
+	Off the top of my head these are a few things I need to do ....	
+	
+	Center head using bounding box.
+	
+	Display face state to on-screen text
+	
+	X Display FPS to on-screen text
+	
+	Display Last refresh [ of face ] in seconds.
+	
+	Display indicator if face is being displayed.
+	
+	Mouse hover/click should display the index of the face point to on-screen text.
 
-	Migrating to 3D rendering will theoretically offer better shading, too. At some point I would like render the facial shapes with a flickering candle in the background.
+	
+	http://www.gamedev.net/topic/557284-mouse-hit-testknow-when-mouse-is-over-something/
+	http://stackoverflow.com/questions/38255693/why-is-my-mouse-cursor-coordinates-suddenly-scaled
+	
+	
 
 
 =======================================

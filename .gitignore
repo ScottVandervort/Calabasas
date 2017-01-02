@@ -55,3 +55,5 @@ Calabasas.*/obj/**
 Calabasas/bin/**
 Calabasas/obj/**
 .vs
+
+Calabasas.FaceTracker/NuiDatabase/**

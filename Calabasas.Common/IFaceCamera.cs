@@ -7,7 +7,7 @@ namespace Calabasas
     {
         void Start();
         void Stop();
-        event EventHandler<VectorType[]> OnFaceChanged; 
-        event EventHandler OnTrackingFace;
+        event EventHandler<FaceState> OnFaceChanged;
+        event EventHandler<bool> OnTrackingFace;
     }
 }
