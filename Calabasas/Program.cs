@@ -8,22 +8,22 @@ namespace Calabasas
         {
             IFaceCamera<System.Drawing.PointF> camera = new FaceCamera();
 
-            //IPumpkinFaceRenderer<System.Drawing.PointF> pumpkinFaceRenderer = new PumpkinFaceRenderer2D(camera);
+            PumpkinFaceRenderer pumpkinFaceRenderer = new PumpkinFaceRenderer(camera);
             //pumpkinFaceRenderer.Draw(new System.Drawing.PointF[] { new System.Drawing.PointF(0, 0), new System.Drawing.PointF(100, 0), new System.Drawing.PointF(100, 100), new System.Drawing.PointF(0, 100) });
 
-            PumpkinFaceRenderer pumpkinFaceRenderer = new PumpkinFaceRenderer(null);
+            //PumpkinFaceRenderer pumpkinFaceRenderer = new PumpkinFaceRenderer(null);
 
-            FaceState faceState = new FaceState()
-            {
-                BoundingBox = new System.Drawing.Rectangle(0, 0, 100, 100),
-                Points = new System.Drawing.PointF[] {
-                    new System.Drawing.PointF(0, 0),
-                    new System.Drawing.PointF(100, 0),
-                    new System.Drawing.PointF(100, 100),
-                    new System.Drawing.PointF(0, 100) }
-            };
+            //FaceState faceState = new FaceState()
+            //{
+            //    BoundingBox = new System.Drawing.Rectangle(0, 0, 100, 100),
+            //    Points = new System.Drawing.PointF[] {
+            //        new System.Drawing.PointF(0, 0),
+            //        new System.Drawing.PointF(100, 0),
+            //        new System.Drawing.PointF(100, 100),
+            //        new System.Drawing.PointF(0, 100) }
+            //};
 
-            pumpkinFaceRenderer.Draw(faceState);
+            //pumpkinFaceRenderer.Draw(faceState);
 
             pumpkinFaceRenderer.Start();
         }

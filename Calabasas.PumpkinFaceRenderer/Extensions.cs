@@ -21,11 +21,16 @@
 
         public static SharpDX.Vector2[] ConvertToVector2(this System.Drawing.PointF [] points)
         {
-            SharpDX.Vector2[] result = new SharpDX.Vector2[points.Length];
+            SharpDX.Vector2[] result = { };
 
-            for (int index = 0; index < points.Length; index++)
+            if (points != null && points.Length > 0)
             {
-                result[index] = new SharpDX.Vector2(points[index].X, points[index].Y);
+                result = new SharpDX.Vector2[points.Length];
+
+                for (int index = 0; index < points.Length; index++)
+                {
+                    result[index] = new SharpDX.Vector2(points[index].X, points[index].Y);
+                }
             }
 
             return result;
