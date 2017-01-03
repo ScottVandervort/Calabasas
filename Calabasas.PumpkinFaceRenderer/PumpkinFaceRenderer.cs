@@ -19,8 +19,6 @@ namespace Calabasas
 
         IFaceCamera<System.Drawing.PointF> faceCamera;
 
-        FramesPerSecond framesPerSecond;
-
         private RenderForm renderForm;
         private SwapChainDescription swapChainDesc;
         private SharpDX.Direct3D11.Device device;
@@ -33,8 +31,21 @@ namespace Calabasas
         private Surface surface;
         private DrawingStateBlock drawingStateBlock;
 
-        private Vector2[] points = { };
-        private Vector2 center = new Vector2(0, 0);
+        private Vector2[] facePoints = { };
+        private Vector2 faceCenter = new Vector2(0, 0);
+        private RectangleF faceBoundingBox = new RectangleF();
+        private int? indexTopOfHeadPoint;
+        private bool isLeftEyeClosed;
+        private bool isRightEyeClosed;
+        private bool isHappy;
+        private bool isMouthOpen;
+        private bool isMouthMoved;
+        private bool isWearingGlasses;
+
+        private Vector2 selectedFacePoint;
+        private int selectedFacePointIndex;
+        FramesPerSecond framesPerSecond;
+
         private Matrix3x2 transformation = Matrix3x2.Identity;
 
         //private Vector2[] leftEyebrow = { };
@@ -124,15 +135,32 @@ namespace Calabasas
 
         public void Draw(FaceState faceState)
         {
-            this.center = faceState.Center.ConvertToVector2();
-            this.points = faceState.Points.ConvertToVector2();
-            this.transformation =
-               Matrix3x2.Translation(-center.X, -center.Y) *
-               Matrix3x2.Scaling(3, 3) *
-              Matrix3x2.Translation(Width / 2, Height / 2);
+            // Determining the index of the point at the top of the head is expensive. Only need to do this once.
+            if (!this.indexTopOfHeadPoint.HasValue)            
+                this.indexTopOfHeadPoint = faceState.IndexTopOfHeadPoint;
 
+            this.isLeftEyeClosed = faceState.IsLeftEyeClosed;
+            this.isRightEyeClosed = faceState.IsRightEyeClosed;
+            this.isHappy = faceState.IsHappy;
+            this.isMouthOpen = faceState.IsMouthOpen;
+            this.isMouthMoved = faceState.IsMouthMoved;
+            this.isWearingGlasses = faceState.IsWearingGlasses;
 
+            if (this.indexTopOfHeadPoint.HasValue)
+            {
+                this.facePoints = faceState.Points.ConvertToVector2();
 
+                this.faceBoundingBox = faceState.BoundingBox.ConvertToRectangleF();
+
+                this.faceCenter = new Vector2(
+                            this.facePoints[this.indexTopOfHeadPoint.Value].X,
+                            this.facePoints[this.indexTopOfHeadPoint.Value].Y + this.faceBoundingBox.Height / 2.0f);
+
+                this.transformation =
+                    Matrix3x2.Translation(-faceCenter.X, -faceCenter.Y) *
+                    Matrix3x2.Scaling(3, 3) *
+                    Matrix3x2.Translation(Width / 2, Height / 2);
+            }
         }
 
         //public void Draw(System.Drawing.PointF [] points)
@@ -179,7 +207,7 @@ namespace Calabasas
 
         private bool IsDrawingFace()
         {
-            return (this.points != null && this.points.Length == ExpectedFacePoints);
+            return (this.facePoints != null && this.facePoints.Length == ExpectedFacePoints);
         }
 
         //private void GenerateFace()
@@ -282,13 +310,21 @@ namespace Calabasas
             //    //renderPolygon(this.points);
             //}
 
-            for (int pointIndex = 0; pointIndex < points.Length; pointIndex++)
-                renderPoint(points[pointIndex]);
+            for (int pointIndex = 0; pointIndex < facePoints.Length; pointIndex++)
+                renderPoint(facePoints[pointIndex]);
 
             d2dRenderTarget.RestoreDrawingState(drawingStateBlock);
 
             renderText(new Vector2(0, 0), String.Format("FPS: {0}", framesPerSecond.GetFPS().ToString()));
             renderText(new Vector2(0, 20), String.Format("Runtime: {0}", framesPerSecond.RunTime.ToString(@"hh\:mm\:ss\:ff")));
+            renderText(new Vector2(0, 40), String.Format("Total Face Points: {0}", ((this.facePoints != null) ? this.facePoints.Length : 0)));
+            renderText(new Vector2(0, 40), String.Format("Is Left Eye Closed: {0}", this.isLeftEyeClosed));
+            renderText(new Vector2(0, 60), String.Format("Is Right Eye Closed: {0}", this.isRightEyeClosed));
+            renderText(new Vector2(0, 80), String.Format("Is Happy: {0}", this.isHappy));
+            renderText(new Vector2(0, 100), String.Format("Is Mouth Open: {0}", this.isMouthOpen));
+            renderText(new Vector2(0, 120), String.Format("Is Mouth Moved: {0}", this.isMouthMoved));
+            renderText(new Vector2(0, 140), String.Format("Is Wearing Glasses: {0}", this.isWearingGlasses));
+            renderText(new Vector2(0, 160), String.Format("Is Wearing Glasses: {0}", this.isWearingGlasses));
 
             d2dRenderTarget.EndDraw();
 
@@ -379,7 +415,7 @@ namespace Calabasas
 
             RectangleF transformedClickArea = new RectangleF(transformedClicked.X, transformedClicked.Y, 10, 10);
 
-            foreach (Vector2 point in this.points)
+            foreach (Vector2 point in this.facePoints)
             {
                 if (transformedClickArea.Contains(point))
                 {
@@ -393,3 +429,4 @@ namespace Calabasas
 
 
 }
+ 

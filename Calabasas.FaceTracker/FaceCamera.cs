@@ -1,14 +1,7 @@
 ﻿using Microsoft.Kinect;
 using Microsoft.Kinect.Face;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Drawing;
-
-
-// TODO: How to get happy, sad, wearing glasses, etc...
-// https://msdn.microsoft.com/en-us/library/dn782034.aspx#ID4E3
-//https://github.com/Vangos
 
 namespace Calabasas
 {
@@ -40,6 +33,7 @@ namespace Calabasas
             {
 
                 _sensor.IsAvailableChanged += OnKinectSensorChanged;
+
                 _bodySource = _sensor.BodyFrameSource;
                 _bodyReader = _bodySource.OpenReader();
 
@@ -49,8 +43,7 @@ namespace Calabasas
                 _faceReaderHighDef = _faceSourceHighDef.OpenReader();
                 _faceReaderHighDef.FrameArrived += OnFaceReaderHighDefFrameArrived;
 
-                _faceSource = new FaceFrameSource(_sensor, 0, FaceFrameFeatures.BoundingBoxInColorSpace |
-                                                              FaceFrameFeatures.Glasses |
+                _faceSource = new FaceFrameSource(_sensor, 0, FaceFrameFeatures.Glasses |
                                                               FaceFrameFeatures.Happy |
                                                               FaceFrameFeatures.LeftEyeClosed |
                                                               FaceFrameFeatures.MouthOpen |
@@ -76,11 +69,6 @@ namespace Calabasas
 
                     if (result != null)
                     {
-                        _faceState.BoundingBox = new System.Drawing.Rectangle(
-                                            result.FaceBoundingBoxInColorSpace.Left,
-                                            result.FaceBoundingBoxInColorSpace.Top,
-                                            result.FaceBoundingBoxInColorSpace.Right - result.FaceBoundingBoxInColorSpace.Left,
-                                            result.FaceBoundingBoxInColorSpace.Bottom - result.FaceBoundingBoxInColorSpace.Top);
                         _faceState.IsHappy = result.FaceProperties[FaceProperty.Happy] == DetectionResult.Yes;
                         _faceState.IsLeftEyeClosed = result.FaceProperties[FaceProperty.LeftEyeClosed] == DetectionResult.Yes;
                         _faceState.IsRightEyeClosed = result.FaceProperties[FaceProperty.RightEyeClosed] == DetectionResult.Yes;

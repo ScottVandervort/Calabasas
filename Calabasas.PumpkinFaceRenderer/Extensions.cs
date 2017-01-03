@@ -40,5 +40,10 @@
         {
             return new SharpDX.Mathematics.Interop.RawVector2(vector.X,vector.Y);
         }
+
+        public static SharpDX.RectangleF ConvertToRectangleF( this System.Drawing.RectangleF rectangle)
+        {
+            return new SharpDX.RectangleF(rectangle.X, rectangle.Y, rectangle.Width, rectangle.Height);
+        }
     }
 }

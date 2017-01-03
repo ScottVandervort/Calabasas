@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calabasas.Common", "Calabas
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calabasas.FaceTracker", "Calabasas.FaceTracker\Calabasas.FaceTracker.csproj", "{052D2B3F-4432-4887-BBEB-3EC25C2E1F32}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calabasas.Test", "Calabasas.Test\Calabasas.Test.csproj", "{15E02605-6248-46E6-A1FC-DFF0EC165A7C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -65,6 +67,18 @@ Global
 		{052D2B3F-4432-4887-BBEB-3EC25C2E1F32}.Release|x64.Build.0 = Release|Any CPU
 		{052D2B3F-4432-4887-BBEB-3EC25C2E1F32}.Release|x86.ActiveCfg = Release|Any CPU
 		{052D2B3F-4432-4887-BBEB-3EC25C2E1F32}.Release|x86.Build.0 = Release|Any CPU
+		{15E02605-6248-46E6-A1FC-DFF0EC165A7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15E02605-6248-46E6-A1FC-DFF0EC165A7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15E02605-6248-46E6-A1FC-DFF0EC165A7C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{15E02605-6248-46E6-A1FC-DFF0EC165A7C}.Debug|x64.Build.0 = Debug|Any CPU
+		{15E02605-6248-46E6-A1FC-DFF0EC165A7C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{15E02605-6248-46E6-A1FC-DFF0EC165A7C}.Debug|x86.Build.0 = Debug|Any CPU
+		{15E02605-6248-46E6-A1FC-DFF0EC165A7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15E02605-6248-46E6-A1FC-DFF0EC165A7C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15E02605-6248-46E6-A1FC-DFF0EC165A7C}.Release|x64.ActiveCfg = Release|Any CPU
+		{15E02605-6248-46E6-A1FC-DFF0EC165A7C}.Release|x64.Build.0 = Release|Any CPU
+		{15E02605-6248-46E6-A1FC-DFF0EC165A7C}.Release|x86.ActiveCfg = Release|Any CPU
+		{15E02605-6248-46E6-A1FC-DFF0EC165A7C}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

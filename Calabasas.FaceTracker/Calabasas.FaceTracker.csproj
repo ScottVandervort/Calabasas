@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Calabasas</RootNamespace>
-    <AssemblyName>Calabasas.FaceTracker2</AssemblyName>
+    <AssemblyName>Calabasas.FaceTracker</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

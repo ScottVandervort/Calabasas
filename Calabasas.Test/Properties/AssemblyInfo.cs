@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Calabasas.FaceTracker")]
+[assembly: AssemblyTitle("Calabasas.Test")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("FaceTracker")]
-[assembly: AssemblyCopyright("Copyright ©  2016")]
+[assembly: AssemblyCompany("Qualcomm Incorporated")]
+[assembly: AssemblyProduct("Calabasas.Test")]
+[assembly: AssemblyCopyright("Copyright © Qualcomm Incorporated 2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("052d2b3f-4432-4887-bbeb-3ec25c2e1f32")]
+[assembly: Guid("15e02605-6248-46e6-a1fc-dff0ec165a7c")]
 
 // Version information for an assembly consists of the following four values:
 //
