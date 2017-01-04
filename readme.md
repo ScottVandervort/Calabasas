@@ -7,7 +7,7 @@
 <a href="http://www.instructables.com/id/How-to-Connect-a-Kinect/?ALLSTEPS">Instructables</a>
 
 
-<h2>Day 2  - Installation</h2>
+<h2>Day 2 Â - Installation</h2>
 
 Install in this order ...
 
@@ -32,9 +32,9 @@ Day 4 - Create sample project
 
 Going C# as I haven't done win32 forever
 
-Using FaceTrackingBasics-WPF as a template
+UsingÂ FaceTrackingBasics-WPF as a template
 
-As I just need a 2D mesh it looks like IFTResult.Get2DShapePoints() is what I need. There are some other goodies as well that are covered in the Face API from Day 1.
+As I just need a 2D mesh it looks likeÂ IFTResult.Get2DShapePoints() is what I need. There are some other goodies as well that are covered in the Face API from Day 1.
 
 Day 4 - Yup, definitely going C#
 ------------------------------------------
@@ -46,7 +46,7 @@ Now doing it in C# and using the "Face Tracking 3D WPF" sample as a template. Th
 Day 5 - Wrote some untested Kinnect initialization code
 ------------------------------------------
 
-The "Face Tracking 3D WPF" example renders the entire image captured by the Kinnect; I don't think I care about this - at least not for now.
+The "Face Tracking 3D WPF"Â example renders the entire image captured by the Kinnect; I don't think I care about this - at least not for now.
 
 FaceTrackingViewer.xaml.cs is key. Need to figure out what is the relationship between the [Kinnect] Sensor, Skeleton, SkeletonFaceTracker, FaceTracker, and FaceTrackFrame. It looks like the desired points are retrieved from FaceTrackFrame - but I need to know how to generate it.
 
@@ -55,8 +55,8 @@ Next time should test sensor initialization code and research relationship betwe
 Day 6 - Sensor Initialization Code Works
 ------------------------------------------
 
-So, my code works. The WPF example hits an exception  when setting the depth of the Kinnect :
- newSensor.DepthStream.Range = DepthRange.Near;
+So, my code works. The WPF example hits an exception Â when setting the depth of the Kinnect :
+Â newSensor.DepthStream.Range = DepthRange.Near;
 
 It recovers by setting it to DepthRange.Default. I read that newer Kinnects are better at close range. APparently mine is not one of those.
 
@@ -64,14 +64,14 @@ I am in the process of merging the WPF MainWindow and FaceTrackingViewer into th
 
 The SkeletonFaceTracker appears to be important - and fortunately, it can be easily ported over.
 
-It looks like AllFramesReady and KinectChanged are the two main entry points for the Kinnect.
+It looks likeÂ AllFramesReady andÂ KinectChanged are the two main entry points for the Kinnect.
 
 Lastly, I picked a bad name for my project and will need to change it as FaceTracker is one of the main assemblies used by Microsofts API. I should have seen this coming.
 
 Day 7 - It compiles
 ------------------------------------------
 
-SkeletonFaceTracker stores facePoints for each frame. Each point is a location on the face ( FeaturePoint)  and an x,y value (PointF).
+SkeletonFaceTracker stores facePoints for each frame. Each point is a location on the face ( FeaturePoint) Â and an x,y value (PointF).
 
 Each time a new frame is rendered I want to print location of my forehead to see if it changes when I move.
 
@@ -91,15 +91,15 @@ Day 9 - Working with DirectX ( SharpDX )
 
 I found a managed wrapper around DirectX called SharpDX (https://github.com/sharpdx).I forgot how much fun it is working with low-level DirectX. So much stuff that can be relegated to boiler-plate code. Sigh.
 
-I found a pretty good tutorial (https://github.com/mrjfalk/SharpDXTutorials) that draws a simple Triangle using vertices and some shaders. This is pretty much all I need given the 2D points that the Kinnect Face Tracker is going to produce.
+I found a pretty good tutorial (https://github.com/mrjfalk/SharpDXTutorials)Â that draws a simple Triangle using vertices and some shaders. This is pretty much all I need given the 2D points that the Kinnect Face Tracker is going to produce.
 One problem with the tutorial is that it is using a slightly older version SharpDX so I have stumbled a few times. 3.0.1.0 versus 3.1.1.0.
 
-I am [trying] to use nugget for dependencies. Unfortunately, as I am using a v1 Kinnect (Xbox 360) I am stuck with the 1.7 SDK. The 1.7 SDK is NOT kept in nugget and requires an installer. So much for portable code....
+I am [trying] to use nugget for dependencies. Unfortunately, as I am using a v1 Kinnect (Xbox 360)Â I am stuck with the 1.7 SDK. The 1.7 SDK is NOT kept in nugget and requires an installer. So much for portable code....
 
 Day 10 - Sample DirectX Project Working
 ------------------------------------------
 
-This required pulling in a BUNCH of dependencies for SharpDX from Nuget. I almost switched over to using MonoGame - but I think it will be way overkill for the first version of this project. 
+This required pulling in a BUNCH of dependencies for SharpDX from Nuget. I almost switched over to using MonoGame - but I think it will be way overkill for the first version of this project.Â 
 
 Next up ...
 
@@ -114,12 +114,12 @@ Update the vertices in each buffer whenever kinnect changes.
 Day 10 - Part 2 - Cleaning up the project for Github
 ------------------------------------------
 
-So, .csproj refers to KINECTSDK10_DIR; This token (and others) are environment variables set up by SDK installers. Can use them to add non-nuget dependencies to the Calabasas solution and projects,
+So, .csproj refers toÂ KINECTSDK10_DIR; This token (and others) are environment variables set up by SDK installers. Can use them to add non-nuget dependencies to the Calabasas solution and projects,
 
-I finally was able to ditch the Toolkit and Toolkit.Facetracking projects and just use the .dll's provided by the SDK. This is what needed to be done ... 
+I finally was able to ditch the Toolkit and Toolkit.Facetracking projects and just use the .dll's provided by the SDK. This is what needed to be done ...Â 
 
 - My projects need to be compiled as amd64 (64-bit).
-- Need to copy facetrackdata.dll and facetracklib.dll from the SDK's \Redist\amd64 folder.
+- Need to copy facetrackdata.dll and facetracklib.dll fromÂ the SDK's \Redist\amd64 folder.
 
 This helped a lot: https://channel9.msdn.com/Forums/Coffeehouse/kinect-face-tracking-tutorial
 
