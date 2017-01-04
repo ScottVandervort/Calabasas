@@ -1,5 +1,54 @@
 The primary goal of this project is to use Microsoft's Face API and a v1 Kinnect to record my face live, render it as a jack-o-lantern, and project it onto a pumpkin. The secondary goal of this project is to mess with a lot of kids by Halloween 2017.
 
+=======================================
+
+Stuff to do ......
+-------------------------------------------
+
+Phase 1
+-------------------------------------------
+
+[X] Center Head
+
+Stop using bounding box. Too course of measurement (int). Instead,
+Given all points find point closest to center of head. This index is the "center".
+The FaceState Center property should just regurgitate the vertex at this index.
+
+[X] Display info on-screen
+
+[X] Mouse
+
+Click should display the face point in on-screen info.
+
+[ ] Curate Kinect points
+
+[ ]	Determine which Kinect points/indices map to desired facial features
+
+Create enums for each.
+Render eyes, nose, etc.. using enums.
+
+[ ] Keyboard
+
+(+/-) should scale face
+(s)how :  All Kinect Points | Curated Kinect Points | Show Curated Kinect Lines | Show Curated Kinect Points and Lines
+(d)ebug : Show bounding box and center point.
+(c)apture : Raw Kinect Points to file.
+
+[ ] Optimize DirectX
+
+Might need to migrate to Direct3D; Rendering points is expensive.
+
+Phase 2
+-------------------------------------------
+
+[ ] Draw Pumpkin Face
+
+[ ] Add a RadialGradient fill to all facial shapes whereas the center of the fill is in the screen center; This should make it look like a candle is backlighting everything the same way.
+
+[ ] Make the RadialGradient "flicker" like a candle.
+
+=======================================
+
 Day 1 - Inspiration
 ------------------------------------------
 
@@ -262,48 +311,7 @@ Fortunately, dots are only going to be displayed during debug. The actual face w
 I am not going to look into migrating to Direct3D unless line/polygon rendering is also abysmal.
 
 
-=======================================
 
-Stuff to do ......
--------------------------------------------
 
-Phase 1
--------------------------------------------
 
-[X] Center Head
-
-Stop using bounding box. Too course of measurement (int). Instead,
-Given all points find point closest to center of head. This index is the "center".
-The FaceState Center property should just regurgitate the vertex at this index.
-
-[X] Display info on-screen
-
-[X] Mouse      
-    Click should display the face point in on-screen info.
-
-[ ] Curate Kinect points
-
-[ ]	Determine which Kinect points/indices map to desired facial features
-    
-    Create enums for each.
-    Render eyes, nose, etc.. using enums.
-
-[ ] Keyboard
-    (+/-) should scale face
-    (s)how :  All Kinect Points | Curated Kinect Points | Show Curated Kinect Lines | Show Curated Kinect Points and Lines
-    (d)ebug : Show bounding box and center point.
-    (c)apture : Raw Kinect Points to file.
-
-[ ] Optimize DirectX
-
-Might need to migrate to Direct3D; Rendering points is expensive.
-
-Phase 2
--------------------------------------------
-
-[ ] Draw Pumpkin Face
-
-[ ] Add a RadialGradient fill to all facial shapes whereas the center of the fill is in the screen center; This should make it look like a candle is backlighting everything the same way.
-
-[ ] Make the RadialGradient "flicker" like a candle.
 
