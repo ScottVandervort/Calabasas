@@ -1,5 +1,3 @@
-The primary goal of this project is to use Microsoft's Face API and a v1 Kinnect to record my face live, render it as a jack-o-lantern, and project it onto a pumpkin. The secondary goal of this project is to mess with a lot of kids by Halloween 2017.
-
 Stuff to do ......
 -------------------------------------------
 
