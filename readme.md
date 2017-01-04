@@ -3,10 +3,10 @@ The primary goal of this project is to use Microsoft's Face API and a v1 Kinnect
 Day 1 - Inspiration
 ------------------------------------------
 
-Microsoft Face API 
+Microsoft Face API
 https://msdn.microsoft.com/en-us/library/jj130970.aspx
 
-Instructables 
+Instructables
 http://www.instructables.com/id/How-to-Connect-a-Kinect/?ALLSTEPS"
 
 Day 2  - Installation
@@ -267,7 +267,8 @@ I am not going to look into migrating to Direct3D unless line/polygon rendering 
 Stuff to do ......
 -------------------------------------------
 
-Phase 1 :
+Phase 1
+-------------------------------------------
 
 [X] Center Head
 
@@ -277,26 +278,28 @@ The FaceState Center property should just regurgitate the vertex at this index.
 
 [X] Display info on-screen
 
-[X] Mouse
-[X] Click should display the face point in on-screen info.
+[X] Mouse      
+    Click should display the face point in on-screen info.
 
 [ ] Curate Kinect points
 
 [ ]	Determine which Kinect points/indices map to desired facial features
-Create enums for each.
-Render eyes, nose, etc.. using enums.
+    
+    Create enums for each.
+    Render eyes, nose, etc.. using enums.
 
 [ ] Keyboard
-[ ] (+/-) should scale face
-[ ] (s)how :  All Kinect Points | Curated Kinect Points | Show Curated Kinect Lines | Show Curated Kinect Points and Lines
-[ ] (d)ebug : Show bounding box and center point.
-[ ] (c)apture : Raw Kinect Points to file.
+    (+/-) should scale face
+    (s)how :  All Kinect Points | Curated Kinect Points | Show Curated Kinect Lines | Show Curated Kinect Points and Lines
+    (d)ebug : Show bounding box and center point.
+    (c)apture : Raw Kinect Points to file.
 
 [ ] Optimize DirectX
 
 Might need to migrate to Direct3D; Rendering points is expensive.
 
-Phase 2 :
+Phase 2
+-------------------------------------------
 
 [ ] Draw Pumpkin Face
 
