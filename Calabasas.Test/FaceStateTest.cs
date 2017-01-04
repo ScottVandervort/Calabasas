@@ -10,7 +10,6 @@ namespace Calabasas.Test
         {
             FaceState faceState = new FaceState();
 
-            Assert.IsTrue(!faceState.indexTopOfHeadPoint.HasValue);
             Assert.IsTrue(faceState.boundingBox == System.Drawing.RectangleF.Empty);
 
 
@@ -48,55 +47,6 @@ namespace Calabasas.Test
 
             boundingBox = FaceState.DetermineBoundingBox(null);
             Assert.IsTrue(boundingBox == System.Drawing.RectangleF.Empty);
-        }
-
-        [TestMethod]
-        public void TestDetermineFaceDimensions()
-        {
-            System.Drawing.RectangleF boundingBox;
-            int indexTopOfHeadPoint;
-
-            System.Drawing.PointF[] points = new System.Drawing.PointF[]
-              {
-                new System.Drawing.PointF(10,10),
-                new System.Drawing.PointF(15,15),
-                new System.Drawing.PointF(20,20),
-                new System.Drawing.PointF(15,40),
-                new System.Drawing.PointF(10,60),
-                new System.Drawing.PointF(5,40),
-                new System.Drawing.PointF(0,20),
-                new System.Drawing.PointF(5,15)
-              };
-
-            FaceState.DetermineFaceDimensions(points, out boundingBox, out indexTopOfHeadPoint);
-
-            Assert.IsTrue(indexTopOfHeadPoint == 0);
-            Assert.IsTrue(boundingBox.Width == 20.0F);
-            Assert.IsTrue(boundingBox.Height == 50.0F);
-            Assert.IsTrue(boundingBox.X == 0);
-            Assert.IsTrue(boundingBox.Y == 10);
-
-            // Slightly different order ...
-
-            points = new System.Drawing.PointF[]
-              {
-                new System.Drawing.PointF(20,20),
-                new System.Drawing.PointF(15,15),
-                new System.Drawing.PointF(0,20),
-                new System.Drawing.PointF(15,40),
-                new System.Drawing.PointF(10,60),
-                new System.Drawing.PointF(5,40),
-                new System.Drawing.PointF(10,10),
-                new System.Drawing.PointF(5,15)
-              };
-
-            FaceState.DetermineFaceDimensions(points, out boundingBox, out indexTopOfHeadPoint);
-
-            Assert.IsTrue(indexTopOfHeadPoint == 6);
-            Assert.IsTrue(boundingBox.Width == 20.0F);
-            Assert.IsTrue(boundingBox.Height == 50.0F);
-            Assert.IsTrue(boundingBox.X == 0);
-            Assert.IsTrue(boundingBox.Y == 10);
         }
 
         [TestMethod]
@@ -142,49 +92,6 @@ namespace Calabasas.Test
                     
             Assert.IsTrue(System.Drawing.RectangleF.Equals(new System.Drawing.RectangleF(1, 2, 3, 4), faceState.BoundingBox));
         }
-
-        [TestMethod]
-        public void TestIndexTopOfHeadPoint()
-        {
-            FaceState faceState = new FaceState();
-
-            faceState.Points = new System.Drawing.PointF[]
-              {
-                new System.Drawing.PointF(20,20),
-                new System.Drawing.PointF(15,15),
-                new System.Drawing.PointF(0,20),
-                new System.Drawing.PointF(15,40),
-                new System.Drawing.PointF(10,60),
-                new System.Drawing.PointF(5,40),
-                new System.Drawing.PointF(10,10),
-                new System.Drawing.PointF(5,15)
-              };
-
-            Assert.IsTrue(faceState.IndexTopOfHeadPoint == 6);
-        }
-
-        [TestMethod]
-        public void TestIndexTopOfHeadPoint_Caching()
-        {
-            FaceState faceState = new FaceState();
-
-            faceState.indexTopOfHeadPoint = 42;
-            faceState.Points = new System.Drawing.PointF[]
-              {
-                new System.Drawing.PointF(20,20),
-                new System.Drawing.PointF(15,15),
-                new System.Drawing.PointF(0,20),
-                new System.Drawing.PointF(15,40),
-                new System.Drawing.PointF(10,60),
-                new System.Drawing.PointF(5,40),
-                new System.Drawing.PointF(10,10),
-                new System.Drawing.PointF(5,15)
-              };
-
-            Assert.IsTrue(42 == faceState.IndexTopOfHeadPoint.Value);
-        }
     }
-
-
 }
 

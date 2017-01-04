@@ -16,6 +16,7 @@ namespace Calabasas
         private const int Width = 1280;
         private const int Height = 720;
         private const int ExpectedFacePoints = 121;
+        private const int IndexTopOfHeadPoint = 29;
 
         IFaceCamera<System.Drawing.PointF> faceCamera;
 
@@ -34,7 +35,7 @@ namespace Calabasas
         private Vector2[] facePoints = { };
         private Vector2 faceCenter = new Vector2(0, 0);
         private RectangleF faceBoundingBox = new RectangleF();
-        private int? indexTopOfHeadPoint;
+
         private bool isLeftEyeClosed;
         private bool isRightEyeClosed;
         private bool isHappy;
@@ -135,10 +136,6 @@ namespace Calabasas
 
         public void Draw(FaceState faceState)
         {
-            // Determining the index of the point at the top of the head is expensive. Only need to do this once.
-            if (!this.indexTopOfHeadPoint.HasValue)            
-                this.indexTopOfHeadPoint = faceState.IndexTopOfHeadPoint;
-
             this.isLeftEyeClosed = faceState.IsLeftEyeClosed;
             this.isRightEyeClosed = faceState.IsRightEyeClosed;
             this.isHappy = faceState.IsHappy;
@@ -146,21 +143,18 @@ namespace Calabasas
             this.isMouthMoved = faceState.IsMouthMoved;
             this.isWearingGlasses = faceState.IsWearingGlasses;
 
-            if (this.indexTopOfHeadPoint.HasValue)
-            {
-                this.facePoints = faceState.Points.ConvertToVector2();
+            this.facePoints = faceState.Points.ConvertToVector2();
 
-                this.faceBoundingBox = faceState.BoundingBox.ConvertToRectangleF();
+            this.faceBoundingBox = faceState.BoundingBox.ConvertToRectangleF();
 
-                this.faceCenter = new Vector2(
-                            this.facePoints[this.indexTopOfHeadPoint.Value].X,
-                            this.facePoints[this.indexTopOfHeadPoint.Value].Y + this.faceBoundingBox.Height / 2.0f);
+            this.faceCenter = new Vector2(
+                        this.facePoints[IndexTopOfHeadPoint].X,
+                        this.facePoints[IndexTopOfHeadPoint].Y + (this.faceBoundingBox.Height / 2.0f));
 
-                this.transformation =
-                    Matrix3x2.Translation(-faceCenter.X, -faceCenter.Y) *
-                    Matrix3x2.Scaling(3, 3) *
-                    Matrix3x2.Translation(Width / 2, Height / 2);
-            }
+            this.transformation =
+                Matrix3x2.Translation(-faceCenter.X, -faceCenter.Y) *
+                Matrix3x2.Scaling(3, 3) *
+                Matrix3x2.Translation(Width / 2.0f, Height / 2.0f);            
         }
 
         //public void Draw(System.Drawing.PointF [] points)
@@ -310,7 +304,7 @@ namespace Calabasas
             //    //renderPolygon(this.points);
             //}
 
-            for (int pointIndex = 0; pointIndex < facePoints.Length; pointIndex++)
+           for (int pointIndex = 0; pointIndex < facePoints.Length; pointIndex++)
                 renderPoint(facePoints[pointIndex]);
 
             d2dRenderTarget.RestoreDrawingState(drawingStateBlock);
@@ -318,13 +312,13 @@ namespace Calabasas
             renderText(new Vector2(0, 0), String.Format("FPS: {0}", framesPerSecond.GetFPS().ToString()));
             renderText(new Vector2(0, 20), String.Format("Runtime: {0}", framesPerSecond.RunTime.ToString(@"hh\:mm\:ss\:ff")));
             renderText(new Vector2(0, 40), String.Format("Total Face Points: {0}", ((this.facePoints != null) ? this.facePoints.Length : 0)));
-            renderText(new Vector2(0, 40), String.Format("Is Left Eye Closed: {0}", this.isLeftEyeClosed));
-            renderText(new Vector2(0, 60), String.Format("Is Right Eye Closed: {0}", this.isRightEyeClosed));
-            renderText(new Vector2(0, 80), String.Format("Is Happy: {0}", this.isHappy));
-            renderText(new Vector2(0, 100), String.Format("Is Mouth Open: {0}", this.isMouthOpen));
-            renderText(new Vector2(0, 120), String.Format("Is Mouth Moved: {0}", this.isMouthMoved));
-            renderText(new Vector2(0, 140), String.Format("Is Wearing Glasses: {0}", this.isWearingGlasses));
+            renderText(new Vector2(0, 60), String.Format("Is Left Eye Closed: {0}", this.isLeftEyeClosed));
+            renderText(new Vector2(0, 80), String.Format("Is Right Eye Closed: {0}", this.isRightEyeClosed));
+            renderText(new Vector2(0, 100), String.Format("Is Happy: {0}", this.isHappy));
+            renderText(new Vector2(0, 120), String.Format("Is Mouth Open: {0}", this.isMouthOpen));
+            renderText(new Vector2(0, 140), String.Format("Is Mouth Moved: {0}", this.isMouthMoved));
             renderText(new Vector2(0, 160), String.Format("Is Wearing Glasses: {0}", this.isWearingGlasses));
+            renderText(new Vector2(0, 180), String.Format("Is Wearing Glasses: {0}", this.isWearingGlasses));
 
             d2dRenderTarget.EndDraw();
 
@@ -335,7 +329,7 @@ namespace Calabasas
 
         private void renderPoint(SharpDX.Vector2 point)
         {
-            using (EllipseGeometry ellipseGeometry = new EllipseGeometry(d2dFactory, new Ellipse(point.ConvertToRawVector2(), 2.2f, 2.2f)))
+            using (EllipseGeometry ellipseGeometry = new EllipseGeometry(d2dFactory, new Ellipse(point.ConvertToRawVector2(), 0.2f, 0.2f)))
             {
                 Color penColor = Color.DarkOrange;
                 SolidColorBrush penBrush = new SolidColorBrush(d2dRenderTarget, new SharpDX.Color(penColor.R, penColor.G, penColor.B));
@@ -413,13 +407,13 @@ namespace Calabasas
 
 
 
-            RectangleF transformedClickArea = new RectangleF(transformedClicked.X, transformedClicked.Y, 10, 10);
+            RectangleF transformedClickArea = new RectangleF(transformedClicked.X, transformedClicked.Y, 3, 3);
 
-            foreach (Vector2 point in this.facePoints)
+            for (int pointIndex = 0; pointIndex < this.facePoints.Length; pointIndex++)
             {
-                if (transformedClickArea.Contains(point))
+                if (transformedClickArea.Contains(this.facePoints[pointIndex]))
                 {
-                    Console.WriteLine("Hit!" + point);
+                    Console.WriteLine("Hit!" + pointIndex);
                 }
             }
         }

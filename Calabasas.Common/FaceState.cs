@@ -12,38 +12,14 @@ namespace Calabasas
         public bool IsMouthMoved;
         public bool IsWearingGlasses;
         
-        internal int? indexTopOfHeadPoint;
         internal System.Drawing.RectangleF boundingBox;
-
-        public int? IndexTopOfHeadPoint
-        {
-            get
-            {                
-                if (this.Points != null && this.Points.Length > 0 && (!this.indexTopOfHeadPoint.HasValue))
-                {
-                    int resultIndexTopOfHeadPoint = 0;
-
-                    DetermineFaceDimensions(this.Points, out this.boundingBox, out resultIndexTopOfHeadPoint);
-
-                    this.indexTopOfHeadPoint = resultIndexTopOfHeadPoint;
-                }
-
-                return this.indexTopOfHeadPoint;
-            }
-        }
 
         public System.Drawing.RectangleF BoundingBox
         {
             get
             {
-                if (this.Points != null && this.Points.Length > 0 && (this.boundingBox == System.Drawing.RectangleF.Empty))
-                {
-                    int resultIndexTopOfHeadPoint = 0;
-
-                    DetermineFaceDimensions(this.Points, out this.boundingBox, out resultIndexTopOfHeadPoint);
-
-                    this.indexTopOfHeadPoint = resultIndexTopOfHeadPoint;
-                }
+                if (this.Points != null && this.Points.Length > 0 && (this.boundingBox == System.Drawing.RectangleF.Empty))                
+                    this.boundingBox = DetermineBoundingBox(this.Points);                
 
                 return this.boundingBox;
             }
@@ -76,35 +52,6 @@ namespace Calabasas
             }
 
             return result;
-        }
-
-        static public void DetermineFaceDimensions ( System.Drawing.PointF [] points, out System.Drawing.RectangleF boundingBox, out int indexTopOfHeadPoint )
-        {
-            indexTopOfHeadPoint = -1;
-            boundingBox = System.Drawing.RectangleF.Empty;
-
-            if (points != null && points.Length > 0)
-            {
-                boundingBox = DetermineBoundingBox(points);
-            
-                if (boundingBox != System.Drawing.Rectangle.Empty)
-                {
-                    System.Drawing.PointF desiredPoint = new System.Drawing.PointF((boundingBox.Right - boundingBox.Left) / 2.0f, boundingBox.Top);
-                    double minDist = Math.Round(Math.Sqrt(Math.Pow((desiredPoint.X - points[0].X), 2) + Math.Pow((desiredPoint.Y - points[0].Y), 2)), 2);
-                    indexTopOfHeadPoint = 0;
-
-                    for (int pointIndex = 0; pointIndex < points.Length; pointIndex++)
-                    {
-                        double dist = Math.Round(Math.Sqrt(Math.Pow((desiredPoint.X - points[pointIndex].X), 2) + Math.Pow((desiredPoint.Y - points[pointIndex].Y), 2)), 2);
-
-                        if (dist < minDist)
-                        {
-                            indexTopOfHeadPoint = pointIndex;
-                            minDist = dist;                           
-                        }
-                    }
-                }
-            }
         }
     }
 }

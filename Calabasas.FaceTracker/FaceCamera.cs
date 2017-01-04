@@ -49,14 +49,23 @@ namespace Calabasas
                                                               FaceFrameFeatures.MouthOpen |
                                                               FaceFrameFeatures.MouthMoved |
                                                               FaceFrameFeatures.RightEyeClosed);
+
+                _faceSource.TrackingIdLost += _faceSource_TrackingIdLost;
+                _faceSourceHighDef.TrackingIdLost += _faceSource_TrackingIdLost;
                 _faceReader = _faceSource.OpenReader();
                 _faceReader.FrameArrived += OnFaceReaderFrameArrived;
+
 
                 _faceModel = new FaceModel();
                 _faceAlignment = new FaceAlignment();
 
                 _sensor.Open();
             }
+        }
+
+        private void _faceSource_TrackingIdLost(object sender, TrackingIdLostEventArgs e)
+        {
+            Console.WriteLine("Losty tracking " + e.TrackingId);
         }
 
         private void OnFaceReaderFrameArrived(object sender, FaceFrameArrivedEventArgs e)

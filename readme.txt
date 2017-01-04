@@ -252,6 +252,10 @@ Day 23 - Working on centering
 	So, the face center will require a bounding box (which is updated continuously) and the index of the Kinect point corresponding to the top of the head.
 	I chose the top of the head as it shouldn't change when the subjects jaw moves. The cen
 
+	It looks like Kinect WILL attempt to regain face tracking if lost. Best way to recalibrate is to move away from camera about 5 feet and then slowly re-approach it.
+
+	Lastly, my DirectX skills are crap. Rendering is taking way way way too long. Need to optimize.
+
 
 =======================================
 
@@ -260,13 +264,13 @@ Stuff to do ......
 		
 Phase 1 :
 
-	[ ] Center Head
+	[X] Center Head
 		
 		Stop using bounding box. Too course of measurement (int). Instead, 
 			Given all points find point closest to center of head. This index is the "center". 
 				The FaceState Center property should just regurgitate the vertex at this index.
 
-	[ ] Display info on-screen
+	[X] Display info on-screen
 
 	[ ] Mouse 
 		[ ] Click should display the face point in on-screen info.
@@ -282,6 +286,10 @@ Phase 1 :
 		[ ] (s)how :  All Kinect Points | Curated Kinect Points | Show Curated Kinect Lines | Show Curated Kinect Points and Lines
 		[ ] (d)ebug : Show bounding box and center point.
 		[ ] (c)apture : Raw Kinect Points to file. 
+
+	[ ] Optimize DirectX
+
+		Rendering of points and text is excruciatingly slow. 
 		
 Phase 2 : 				
 		
