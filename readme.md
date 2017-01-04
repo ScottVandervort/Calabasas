@@ -1,13 +1,16 @@
-<h1>The primary goal of this project is to use Microsoft's Face API and a v1 Kinnect to record my face live, render it as a jack-o-lantern, and project it onto a pumpkin. The secondary goal of this project is to mess with a lot of kids by Halloween 2017.</h1>
+The primary goal of this project is to use Microsoft's Face API and a v1 Kinnect to record my face live, render it as a jack-o-lantern, and project it onto a pumpkin. The secondary goal of this project is to mess with a lot of kids by Halloween 2017.
 
-<h2>Day 1 - Inspiration</h2>
+Day 1 - Inspiration
+------------------------------------------
 
-<a href="https://msdn.microsoft.com/en-us/library/jj130970.aspx">Microsoft Face API</a>
+Microsoft Face API 
+https://msdn.microsoft.com/en-us/library/jj130970.aspx
 
-<a href="http://www.instructables.com/id/How-to-Connect-a-Kinect/?ALLSTEPS">Instructables</a>
+Instructables 
+http://www.instructables.com/id/How-to-Connect-a-Kinect/?ALLSTEPS"
 
-
-<h2>Day 2  - Installation</h2>
+Day 2  - Installation
+------------------------------------------
 
 Install in this order ...
 
@@ -78,7 +81,7 @@ Each time a new frame is rendered I want to print location of my forehead to see
 Day 8 - It runs
 ------------------------------------------
 
-Added a console out that tracks my chin. 
+Added a console out that tracks my chin.
 
 Needed to reference projects from FaceTrackingBasics-WPF example. The assemblies would not load properly.
 
@@ -126,7 +129,7 @@ This helped a lot: https://channel9.msdn.com/Forums/Coffeehouse/kinect-face-trac
 Day 11 - Architecture
 ------------------------------------------
 
-PumpkinFaceTracker.Program (i.e., the Kinnect) spawns a new PumpkinFaceTracker object for every frame and stores it in array. 
+PumpkinFaceTracker.Program (i.e., the Kinnect) spawns a new PumpkinFaceTracker object for every frame and stores it in array.
 Each PumpkinFaceTracker does some logic and generates facial features.
 These feature need to be rendered using DirectX.
 
@@ -136,8 +139,8 @@ Or, does PumpkinFaceTracker broadcast an event that renderer listens for? Or, ca
 Day 12 - Face API facial point enumeration is incomplete!
 ------------------------------------------
 
-It looks like the FeaturePoint enumeration does not include all of the facial points that I have seen displayed in the Kinnect propaganda online. 
-	Or, the enumeration is in a different order.
+It looks like the FeaturePoint enumeration does not include all of the facial points that I have seen displayed in the Kinnect propaganda online.
+Or, the enumeration is in a different order.
 
 Next step is to create a 2nd Draw() method in Renderer that just takes all points from Kinnect, Renders the point as their index/number on the screen.
 
@@ -146,158 +149,158 @@ Ugh.....
 Day 13 - Forget D3D, I am using D2D ... and DirectWrite
 ------------------------------------------
 
-	SharpDx has better examples than the one I was originally working from:
-		https://github.com/sharpdx/SharpDX-Samples/blob/master/Desktop/Direct2D1/MiniRect/Program.cs
-		
-	It is going to be esier to use Direct2D than Direct3D. It looks like it supports bitmaps, shaders, ... just about everything I need to render a 2D jack-o-lantern face.
-	
-	Furthermore DirectWrite will make it easier to render numbers on the screen that coordinate with the facial positions.
-	
+SharpDx has better examples than the one I was originally working from:
+https://github.com/sharpdx/SharpDX-Samples/blob/master/Desktop/Direct2D1/MiniRect/Program.cs
+
+It is going to be esier to use Direct2D than Direct3D. It looks like it supports bitmaps, shaders, ... just about everything I need to render a 2D jack-o-lantern face.
+
+Furthermore DirectWrite will make it easier to render numbers on the screen that coordinate with the facial positions.
+
 Day 14 - Now displaying facial points in DirectX as their respective indices
 -------------------------------------------
 
-	... but they are scrunched. Now I need to figure out how to create and apply transforms to D2D. I would like to scale and transform the points that I display.
+... but they are scrunched. Now I need to figure out how to create and apply transforms to D2D. I would like to scale and transform the points that I display.
 
-	This will come in handy when I start "connecting the dots" as well.
+This will come in handy when I start "connecting the dots" as well.
 
 Day 15 - Direct2D/SharpDx supports matrix transformations
 -------------------------------------------
 
-	Example: https://github.com/sharpdx/SharpDX-Samples/blob/master/StoreApp/XAML%20SurfaceImageSource%20DirectX%20interop%20sample/C%23/Scenario1Component/Scenario1ImageSource.cs
+Example: https://github.com/sharpdx/SharpDX-Samples/blob/master/StoreApp/XAML%20SurfaceImageSource%20DirectX%20interop%20sample/C%23/Scenario1Component/Scenario1ImageSource.cs
 
-	Now need to scale and center the rendered face using a translation and scaling matrix.
+Now need to scale and center the rendered face using a translation and scaling matrix.
 
-	I am a bit rusty so need to figure out how to go about doing this (again).
+I am a bit rusty so need to figure out how to go about doing this (again).
 
 
 Day 16 - Solution Re-org
 -------------------------------------------
 
-	Changed PumpkinFaceTracker to FaceTracker. Renderer now just listens to events broadcast from FaceTracer (i.e. it is now just a datasource). "Morphing" of vertices to a jack-o-lantern will now be done entirely in Renderer. This is because the renderer owns the windows form, keyboard/mouse events, etc...
-	
-	Created a new face chart in Gimp with color-coded points that map to Kinnect FaceTracker indices. Microsoft did a real BAD job of this in the FeaturePoint enum that shipped with the xample code - it is missing a lot of key points.
-	
-	Need to ...
-		1) Finish map.
-		2) Figure out how to draw lines in Renderer.
-		3) Draw each face component independently and verify mappings.
-		
+Changed PumpkinFaceTracker to FaceTracker. Renderer now just listens to events broadcast from FaceTracer (i.e. it is now just a datasource). "Morphing" of vertices to a jack-o-lantern will now be done entirely in Renderer. This is because the renderer owns the windows form, keyboard/mouse events, etc...
+
+Created a new face chart in Gimp with color-coded points that map to Kinnect FaceTracker indices. Microsoft did a real BAD job of this in the FeaturePoint enum that shipped with the xample code - it is missing a lot of key points.
+
+Need to ...
+1) Finish map.
+2) Figure out how to draw lines in Renderer.
+3) Draw each face component independently and verify mappings.
+
 Day 17 - Researching how to draw polygons
 -------------------------------------------
 
-	Found some more examples on how to render polygons and gradients using DirectX 2D
-	
-		https://github.com/RobyDX/SharpDX_Demo/blob/master/SharpDXTutorial/TutorialD1
-		http://stackoverflow.com/questions/27289470/draw-and-fill-polygon-using-float-points-sharpdx
-		https://github.com/sharpdx/SharpDX-Samples/tree/master/Desktop/Direct2D1/MiniRect		
+Found some more examples on how to render polygons and gradients using DirectX 2D
 
-	Also, I think I can use a radial gradient to fill the facial shapes. I am hoping I can center the gradient at the screen center (i.e., the "candle" backlighting the face).
-		
+https://github.com/RobyDX/SharpDX_Demo/blob/master/SharpDXTutorial/TutorialD1
+http://stackoverflow.com/questions/27289470/draw-and-fill-polygon-using-float-points-sharpdx
+https://github.com/sharpdx/SharpDX-Samples/tree/master/Desktop/Direct2D1/MiniRect
+
+Also, I think I can use a radial gradient to fill the facial shapes. I am hoping I can center the gradient at the screen center (i.e., the "candle" backlighting the face).
+
 Day 18 - How to reset transformation
 -------------------------------------------
 
-	I am going to need a computer, the Kinnect, a webcam (for watching/listening to the audience), a speaker (for talking to the audience), and a small projector. The computer is going to need to be relatively close. 
+I am going to need a computer, the Kinnect, a webcam (for watching/listening to the audience), a speaker (for talking to the audience), and a small projector. The computer is going to need to be relatively close.
 
-	You can save / restore changes to the rendering target by using SaveDrawingState() and RestoreDrawingState(). This resets andthing applied to the render target - such as transformattions.
+You can save / restore changes to the rendering target by using SaveDrawingState() and RestoreDrawingState(). This resets andthing applied to the render target - such as transformattions.
 
 Day 19 - Finished the onorous task of mapping
 -------------------------------------------
 
-	Mapped 120 facial points tracked by Kinnect to a .png.
+Mapped 120 facial points tracked by Kinnect to a .png.
 
-	FaceTracking toolkit provides only 71 in Microsoft.Kinect.Toolkit.FaceTracking.FeaturePoint - and the vergage of the enum values is very very cryptic.
+FaceTracking toolkit provides only 71 in Microsoft.Kinect.Toolkit.FaceTracking.FeaturePoint - and the vergage of the enum values is very very cryptic.
 
 Day 20 - Time for a new sensor
 -------------------------------------------
 
-	This weekend I tested the project against Jodie and myself. Eye blinks weren't being picked up. Nose scrunches weren't being picked up. Iris movements weren't being picked up. Mouth movement detection was at best, subpar. Sigh. I was about ready to shit can the whole project until I staretd researching the XBox One Kinect Sensor. I watched videos feeds of simple projects. The new sensor is much much improved. I didn't go this route originally because of the cost ( roughly $100 for the sensor and Windows 10 adapter used ). However, after thinking about it and talking it over with Jodie I am going to splurge and give it one final shot.
-	
-	I have the new sensor on order from Ebay. Let's see what happens next...
-	
-Day 21 - Testing new sensor	
+This weekend I tested the project against Jodie and myself. Eye blinks weren't being picked up. Nose scrunches weren't being picked up. Iris movements weren't being picked up. Mouth movement detection was at best, subpar. Sigh. I was about ready to shit can the whole project until I staretd researching the XBox One Kinect Sensor. I watched videos feeds of simple projects. The new sensor is much much improved. I didn't go this route originally because of the cost ( roughly $100 for the sensor and Windows 10 adapter used ). However, after thinking about it and talking it over with Jodie I am going to splurge and give it one final shot.
+
+I have the new sensor on order from Ebay. Let's see what happens next...
+
+Day 21 - Testing new sensor
 -------------------------------------------
 
-	It works! Pretty well, actually.
-	
-	This guy has proved invaluable: https://github.com/Vangos
-	
-	There are two modes in Kinect Face Tracking 2.0 - normal and hi-def. Normal returns a bounding box and very rudimentary facial data. High-def returns about a thousand plotted points.
-	
-	The Kinnect 2.0 API is available through NuGet as well which will make distrubuting these thing much much easier.
-	
+It works! Pretty well, actually.
+
+This guy has proved invaluable: https://github.com/Vangos
+
+There are two modes in Kinect Face Tracking 2.0 - normal and hi-def. Normal returns a bounding box and very rudimentary facial data. High-def returns about a thousand plotted points.
+
+The Kinnect 2.0 API is available through NuGet as well which will make distrubuting these thing much much easier.
+
 Day 22 - Bounding Box results in too much jitter for centering
 -------------------------------------------
 
-	The normal face tracking bounding box is too jitery. I think it is because it is in screen coordinates (integers). This is way too course for the DirectX Device.
+The normal face tracking bounding box is too jitery. I think it is because it is in screen coordinates (integers). This is way too course for the DirectX Device.
 
-	Instead, given all of the points in the face I am going to programatically pick the one closest to the center of the face and store the index. The face center will now be the point at this index.
+Instead, given all of the points in the face I am going to programatically pick the one closest to the center of the face and store the index. The face center will now be the point at this index.
 
-	Also, found some good links for picking points on the rendered screen
+Also, found some good links for picking points on the rendered screen
 
-		http://www.gamedev.net/topic/557284-mouse-hit-testknow-when-mouse-is-over-something/
-		http://stackoverflow.com/questions/38255693/why-is-my-mouse-cursor-coordinates-suddenly-scaled
+http://www.gamedev.net/topic/557284-mouse-hit-testknow-when-mouse-is-over-something/
+http://stackoverflow.com/questions/38255693/why-is-my-mouse-cursor-coordinates-suddenly-scaled
 
 Day 23 - Working on centering
 ---------------------------------------------
 
-	I created some unit tests for the centering algorithms and they failed to run. This is because Visual Studio needs to be configured to run the tests in 64-bit as
-	the projects are all 64-bit. More info here: https://msdn.microsoft.com/en-us/library/ee782531.aspx	
+I created some unit tests for the centering algorithms and they failed to run. This is because Visual Studio needs to be configured to run the tests in 64-bit as
+the projects are all 64-bit. More info here: https://msdn.microsoft.com/en-us/library/ee782531.aspx
 
-	So, the face center will require a bounding box (which is updated continuously) and the index of the Kinect point corresponding to the top of the head.
-	I chose the top of the head as it shouldn't change when the subjects jaw moves. The cen
+So, the face center will require a bounding box (which is updated continuously) and the index of the Kinect point corresponding to the top of the head.
+I chose the top of the head as it shouldn't change when the subjects jaw moves. The cen
 
-	It looks like Kinect WILL attempt to regain face tracking if lost. Best way to recalibrate is to move away from camera about 5 feet and then slowly re-approach it.
+It looks like Kinect WILL attempt to regain face tracking if lost. Best way to recalibrate is to move away from camera about 5 feet and then slowly re-approach it.
 
-	Lastly, my DirectX skills are crap. Rendering is taking way way way too long. Need to optimize.
+Lastly, my DirectX skills are crap. Rendering is taking way way way too long. Need to optimize.
 
 Day 24 - Direct2D Optimization
 ---------------------------------------------
 
-	Drawing 1000 points is freaking slow in Direct2D. I now create a single resuable geometry ( i.e., point) and translate the targets transform to the position of each point when rendering. 
-		I also started drawing rectangles instead of ellipses. It has spec up the frames per second 3x - BUT, 180 FPS while rendering 1000 points is still horribly slow.
-			Fortunately, dots are only going to be displayed during debug. The actual face will consists of lines/filled polygons.
-				I am not going to look into migrating to Direct3D unless line/polygon rendering is also abysmal.
+Drawing 1000 points is freaking slow in Direct2D. I now create a single resuable geometry ( i.e., point) and translate the targets transform to the position of each point when rendering.
+I also started drawing rectangles instead of ellipses. It has spec up the frames per second 3x - BUT, 180 FPS while rendering 1000 points is still horribly slow.
+Fortunately, dots are only going to be displayed during debug. The actual face will consists of lines/filled polygons.
+I am not going to look into migrating to Direct3D unless line/polygon rendering is also abysmal.
 
 
 =======================================
 
 Stuff to do ......
 -------------------------------------------
-		
+
 Phase 1 :
 
-	[X] Center Head
-		
-		Stop using bounding box. Too course of measurement (int). Instead, 
-			Given all points find point closest to center of head. This index is the "center". 
-				The FaceState Center property should just regurgitate the vertex at this index.
+[X] Center Head
 
-	[X] Display info on-screen
+Stop using bounding box. Too course of measurement (int). Instead,
+Given all points find point closest to center of head. This index is the "center".
+The FaceState Center property should just regurgitate the vertex at this index.
 
-	[X] Mouse 
-		[X] Click should display the face point in on-screen info.
+[X] Display info on-screen
 
-	[ ] Curate Kinect points
-	
-		[ ]	Determine which Kinect points/indices map to desired facial features
-				Create enums for each.
-					Render eyes, nose, etc.. using enums.
+[X] Mouse
+[X] Click should display the face point in on-screen info.
 
-	[ ] Keyboard 
-		[ ] (+/-) should scale face
-		[ ] (s)how :  All Kinect Points | Curated Kinect Points | Show Curated Kinect Lines | Show Curated Kinect Points and Lines
-		[ ] (d)ebug : Show bounding box and center point.
-		[ ] (c)apture : Raw Kinect Points to file. 
+[ ] Curate Kinect points
 
-	[ ] Optimize DirectX
+[ ]	Determine which Kinect points/indices map to desired facial features
+Create enums for each.
+Render eyes, nose, etc.. using enums.
 
-		Might need to migrate to Direct3D; Rendering points is expensive.
-		
-Phase 2 : 				
-		
-	[ ] Draw Pumpkin Face 
-	
-	[ ] Add a RadialGradient fill to all facial shapes whereas the center of the fill is in the screen center; This should make it look like a candle is backlighting everything the same way.
-		
-	[ ] Make the RadialGradient "flicker" like a candle.
+[ ] Keyboard
+[ ] (+/-) should scale face
+[ ] (s)how :  All Kinect Points | Curated Kinect Points | Show Curated Kinect Lines | Show Curated Kinect Points and Lines
+[ ] (d)ebug : Show bounding box and center point.
+[ ] (c)apture : Raw Kinect Points to file.
+
+[ ] Optimize DirectX
+
+Might need to migrate to Direct3D; Rendering points is expensive.
+
+Phase 2 :
+
+[ ] Draw Pumpkin Face
+
+[ ] Add a RadialGradient fill to all facial shapes whereas the center of the fill is in the screen center; This should make it look like a candle is backlighting everything the same way.
+
+[ ] Make the RadialGradient "flicker" like a candle.
 
