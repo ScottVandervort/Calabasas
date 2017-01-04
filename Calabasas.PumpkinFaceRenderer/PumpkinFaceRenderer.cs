@@ -17,6 +17,9 @@ namespace Calabasas
         private const int Height = 720;
         private const int ExpectedFacePoints = 121;
         private const int IndexTopOfHeadPoint = 29;
+        private const float PointSize = 0.2f;
+        private const float ClickSize = 2f;
+        private const int ClickTimeoutSeconds = 3;
 
         IFaceCamera<System.Drawing.PointF> faceCamera;
 
@@ -42,9 +45,9 @@ namespace Calabasas
         private bool isMouthOpen;
         private bool isMouthMoved;
         private bool isWearingGlasses;
-
-        private Vector2 selectedFacePoint;
-        private int selectedFacePointIndex;
+        
+        private int? selectedFacePointIndex;
+        private TimeSpan selectedFacePointTimeout;
         FramesPerSecond framesPerSecond;
 
         private Matrix3x2 transformation = Matrix3x2.Identity;
@@ -60,6 +63,10 @@ namespace Calabasas
 
         public TextFormat TextFormat { get; private set; }
         public SolidColorBrush SceneColorBrush { get; private set; }
+
+        private Geometry facePointGeometry;
+        private SolidColorBrush facePointBrush;
+        private Color facePointPenColor = Color.Orange;
 
         public PumpkinFaceRenderer(IFaceCamera<System.Drawing.PointF> faceCamera)
         {
@@ -120,6 +127,10 @@ namespace Calabasas
             // Initialize a Brush.
             SceneColorBrush = new SolidColorBrush(d2dRenderTarget, Color.White);
 
+            // Initialize geometery/drawable primitives.
+            facePointGeometry = new RectangleGeometry(d2dFactory, new SharpDX.Mathematics.Interop.RawRectangleF(-PointSize/2.0F,-PointSize/2.0F,PointSize/2.0F,PointSize/2.0F));
+            facePointBrush = new SolidColorBrush(d2dRenderTarget, new SharpDX.Color(facePointPenColor.R, facePointPenColor.G, facePointPenColor.B));
+
             drawingStateBlock = new DrawingStateBlock(d2dFactory);
 
             framesPerSecond = new FramesPerSecond();
@@ -151,6 +162,10 @@ namespace Calabasas
                         this.facePoints[IndexTopOfHeadPoint].X,
                         this.facePoints[IndexTopOfHeadPoint].Y + (this.faceBoundingBox.Height / 2.0f));
 
+            // Before rendering the facial points:
+            // 1) Translate the target so that the points will be centered.
+            // 2) Scale the points to fit the target.
+            // 3) Translate the target to the center of the client
             this.transformation =
                 Matrix3x2.Translation(-faceCenter.X, -faceCenter.Y) *
                 Matrix3x2.Scaling(3, 3) *
@@ -197,6 +212,8 @@ namespace Calabasas
             SceneColorBrush.Dispose();
             TextFormat.Dispose();
             drawingStateBlock.Dispose();
+            facePointGeometry.Dispose();
+            facePointBrush.Dispose();
         }
 
         private bool IsDrawingFace()
@@ -280,6 +297,8 @@ namespace Calabasas
 
         private void OnRenderCallback()
         {
+            TimeSpan runTime = framesPerSecond.RunTime;
+
             d2dRenderTarget.BeginDraw();
 
             d2dRenderTarget.Clear(Color.Black);
@@ -304,13 +323,12 @@ namespace Calabasas
             //    //renderPolygon(this.points);
             //}
 
-           for (int pointIndex = 0; pointIndex < facePoints.Length; pointIndex++)
-                renderPoint(facePoints[pointIndex]);
+            renderPoints(facePoints);
 
             d2dRenderTarget.RestoreDrawingState(drawingStateBlock);
 
             renderText(new Vector2(0, 0), String.Format("FPS: {0}", framesPerSecond.GetFPS().ToString()));
-            renderText(new Vector2(0, 20), String.Format("Runtime: {0}", framesPerSecond.RunTime.ToString(@"hh\:mm\:ss\:ff")));
+            renderText(new Vector2(0, 20), String.Format("Runtime: {0}", runTime.ToString(@"hh\:mm\:ss\:ff")));
             renderText(new Vector2(0, 40), String.Format("Total Face Points: {0}", ((this.facePoints != null) ? this.facePoints.Length : 0)));
             renderText(new Vector2(0, 60), String.Format("Is Left Eye Closed: {0}", this.isLeftEyeClosed));
             renderText(new Vector2(0, 80), String.Format("Is Right Eye Closed: {0}", this.isRightEyeClosed));
@@ -319,6 +337,8 @@ namespace Calabasas
             renderText(new Vector2(0, 140), String.Format("Is Mouth Moved: {0}", this.isMouthMoved));
             renderText(new Vector2(0, 160), String.Format("Is Wearing Glasses: {0}", this.isWearingGlasses));
             renderText(new Vector2(0, 180), String.Format("Is Wearing Glasses: {0}", this.isWearingGlasses));
+            if (this.facePoints != null && this.facePoints.Length > 0 && this.selectedFacePointIndex.HasValue && this.selectedFacePointTimeout > runTime)
+                renderText(new Vector2(0, 200), String.Format("Clicked Point Index: {0} ({1},{2})", this.selectedFacePointIndex, this.facePoints[this.selectedFacePointIndex.Value].X, this.facePoints[this.selectedFacePointIndex.Value].Y));
 
             d2dRenderTarget.EndDraw();
 
@@ -327,22 +347,25 @@ namespace Calabasas
             framesPerSecond.Frame();
         }
 
-        private void renderPoint(SharpDX.Vector2 point)
+        private void renderPoints (SharpDX.Vector2 [] points)
         {
-            using (EllipseGeometry ellipseGeometry = new EllipseGeometry(d2dFactory, new Ellipse(point.ConvertToRawVector2(), 0.2f, 0.2f)))
+            using (DrawingStateBlock block = new DrawingStateBlock(d2dFactory))
             {
-                Color penColor = Color.DarkOrange;
-                SolidColorBrush penBrush = new SolidColorBrush(d2dRenderTarget, new SharpDX.Color(penColor.R, penColor.G, penColor.B));
+                d2dRenderTarget.SaveDrawingState(block);
 
-                d2dRenderTarget.DrawGeometry(ellipseGeometry, penBrush);
-                d2dRenderTarget.FillGeometry(ellipseGeometry, penBrush, null);
+                foreach (Vector2 point in points)
+                {
+                    d2dRenderTarget.Transform = Matrix3x2.Translation(point) * this.transformation;
+                    d2dRenderTarget.DrawGeometry(this.facePointGeometry, facePointBrush);
+                }
 
+                d2dRenderTarget.RestoreDrawingState(block);
             }
         }
 
         private void renderText(SharpDX.Vector2 point, string text)
         {
-            using (TextLayout textLayout = new TextLayout(dwFactory, text, TextFormat, 200, 50))
+            using (TextLayout textLayout = new TextLayout(dwFactory, text, TextFormat, 400, 50))
             {
                 d2dRenderTarget.DrawTextLayout(point, textLayout, SceneColorBrush, DrawTextOptions.None);
             }
@@ -359,6 +382,7 @@ namespace Calabasas
                     using (GeometrySink geometrySink = pathGeometery.Open())
                     {
                         geometrySink.BeginFigure(points[0], new FigureBegin());
+
                         geometrySink.AddLines(vertices);
                         geometrySink.AddLine(vertices[0]);
                         geometrySink.EndFigure(new FigureEnd());
@@ -390,37 +414,37 @@ namespace Calabasas
 
         private void OnRenderFormMouseClick(object sender, System.Windows.Forms.MouseEventArgs e)
         {
-            Matrix3x2 inverse = new Matrix3x2();
-            Matrix3x2.Invert(ref this.transformation, out inverse);
+            // Mouse clicks are in "screen space". DirectX might be rendering the client/form in a different resolution (i.e., "world space") 
+            // so we need to transform the click coordinates from "screen space" to "world space".
+            // It gets trickier. We want to know what facial point is clicked on. The facial point coordinates exist in "local/object space". They 
+            // were transformed to "world space" prior to being rendered. So, we need to transform the mouse click coordinates from "world space" to 
+            // the facial point "local/object space".            
 
-            Size2F size = this.d2dRenderTarget.Size;
-            System.Drawing.Rectangle clientRec = this.renderForm.ClientRectangle;
+            Matrix3x2 inverseOfRenderTargetTransform = new Matrix3x2();
+            Matrix3x2.Invert(ref this.transformation, out inverseOfRenderTargetTransform);
 
-            float x = size.Width / clientRec.Right;
-            float y = size.Height / clientRec.Bottom;
+            Size2F renderTargetSize = this.d2dRenderTarget.Size;
+            System.Drawing.Rectangle clientSize = this.renderForm.ClientRectangle;
 
-            Vector2 click = new Vector2(e.X * x, e.Y * y);
-            Vector2 transformedClicked = Matrix3x2.TransformPoint(inverse, click);
+            float scalingFromClientToRenderTargetX = renderTargetSize.Width / clientSize.Right;
+            float scalingFromClientToRenderTargetY = renderTargetSize.Height / clientSize.Bottom;
 
+            Vector2 renderTargetClickCoord = new Vector2(e.X * scalingFromClientToRenderTargetX, e.Y * scalingFromClientToRenderTargetY);
+            Vector2 transformedRenderTargetClickCoord = Matrix3x2.TransformPoint(inverseOfRenderTargetTransform, renderTargetClickCoord);
 
+            RectangleF transformedRenderTargetClickArea = new RectangleF(transformedRenderTargetClickCoord.X, transformedRenderTargetClickCoord.Y, ClickSize, ClickSize);
 
-
-
-
-            RectangleF transformedClickArea = new RectangleF(transformedClicked.X, transformedClicked.Y, 3, 3);
+            this.selectedFacePointIndex = null;
 
             for (int pointIndex = 0; pointIndex < this.facePoints.Length; pointIndex++)
-            {
-                if (transformedClickArea.Contains(this.facePoints[pointIndex]))
-                {
-                    Console.WriteLine("Hit!" + pointIndex);
+                if (transformedRenderTargetClickArea.Contains(this.facePoints[pointIndex]))
+                {                    
+                    this.selectedFacePointIndex = pointIndex;
+                    break;
                 }
-            }
+
+            this.selectedFacePointTimeout = this.framesPerSecond.RunTime.Add(new TimeSpan(0, 0, ClickTimeoutSeconds));
         }
     }
-
-
-
-
 }
  

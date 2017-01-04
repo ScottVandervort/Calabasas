@@ -256,6 +256,14 @@ Day 23 - Working on centering
 
 	Lastly, my DirectX skills are crap. Rendering is taking way way way too long. Need to optimize.
 
+Day 24 - Direct2D Optimization
+---------------------------------------------
+
+	Drawing 1000 points is freaking slow in Direct2D. I now create a single resuable geometry ( i.e., point) and translate the targets transform to the position of each point when rendering. 
+		I also started drawing rectangles instead of ellipses. It has spec up the frames per second 3x - BUT, 180 FPS while rendering 1000 points is still horribly slow.
+			Fortunately, dots are only going to be displayed during debug. The actual face will consists of lines/filled polygons.
+				I am not going to look into migrating to Direct3D unless line/polygon rendering is also abysmal.
+
 
 =======================================
 
@@ -272,8 +280,8 @@ Phase 1 :
 
 	[X] Display info on-screen
 
-	[ ] Mouse 
-		[ ] Click should display the face point in on-screen info.
+	[X] Mouse 
+		[X] Click should display the face point in on-screen info.
 
 	[ ] Curate Kinect points
 	
@@ -289,7 +297,7 @@ Phase 1 :
 
 	[ ] Optimize DirectX
 
-		Rendering of points and text is excruciatingly slow. 
+		Might need to migrate to Direct3D; Rendering points is expensive.
 		
 Phase 2 : 				
 		
