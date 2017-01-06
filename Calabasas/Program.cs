@@ -1,45 +1,34 @@
-﻿using SharpDX.Mathematics.Interop;
+﻿using System;
 
 namespace Calabasas
-{ 
+{
     class Program
-    {
-        private const int IndexTopOfHeadPoint = 29;
-
+    {        
         static void Main(string[] args)
         {
-            //IFaceCamera<System.Drawing.PointF> camera = new FaceCamera();
+            IFaceCamera<System.Drawing.PointF> camera = null;
 
-            //PumpkinFaceRenderer pumpkinFaceRenderer = new PumpkinFaceRenderer(camera);
-            //pumpkinFaceRenderer.Draw(new System.Drawing.PointF[] { new System.Drawing.PointF(0, 0), new System.Drawing.PointF(100, 0), new System.Drawing.PointF(100, 100), new System.Drawing.PointF(0, 100) });
-
-            PumpkinFaceRenderer pumpkinFaceRenderer = new PumpkinFaceRenderer(null,5,1);
-
-            //System.Drawing.PointF[] points = new System.Drawing.PointF[1000];
-            //for (int index = 0; index < 1000; index++)
-            //{
-            //    // Renderer uses this point for centering.
-            //    if (index == IndexTopOfHeadPoint)                
-            //        points[index] = new System.Drawing.PointF(500, 0);                
-            //    else
-            //        points[index] = new System.Drawing.PointF(index, index);
-            //}
-            System.Drawing.PointF[] points = new System.Drawing.PointF[]
+            if (args.Length > 0)
             {
-                new System.Drawing.PointF(300,300),
-                new System.Drawing.PointF(450,300),
-                new System.Drawing.PointF(600,300),
-                new System.Drawing.PointF(600,600),
-                new System.Drawing.PointF(300,600)
-            };
-            FaceState faceState = new FaceState()
+                string filePath = args[0];
+
+                if (System.IO.File.Exists(filePath))
+                    camera = new DummyCamera(filePath);
+                else
+                {
+                    Console.WriteLine(String.Format("File does not exist. File: {0}", filePath));
+                    Console.WriteLine("Press any key to exit");
+                    Console.ReadKey();
+                }
+            }
+            else            
+                camera = new KinectCamera();
+
+            if (camera != null)
             {
-                Points = points
-            };
-
-            pumpkinFaceRenderer.Draw(faceState);
-
-            pumpkinFaceRenderer.Start();
+                PumpkinFaceRenderer pumpkinFaceRenderer = new PumpkinFaceRenderer(camera);
+                pumpkinFaceRenderer.Start();
+            }
         }
     }
 }

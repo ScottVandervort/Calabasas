@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Generic;
 
 namespace Calabasas.Test
 {
@@ -91,6 +92,76 @@ namespace Calabasas.Test
                     
             Assert.IsTrue(System.Drawing.RectangleF.Equals(new System.Drawing.RectangleF(1, 2, 3, 4), faceState.BoundingBox));
         }
+
+        [TestMethod]
+        public void TestSaveAndToFile()
+        {
+            List<System.Drawing.PointF> points = new List<System.Drawing.PointF>();
+
+            float   Width = 200,
+                    Height = 200,
+                    PointsPerSide = 58; // Ensures that the 29th point is the "center of the faces head".
+
+            // Top
+            for (float pointNo = 0; pointNo < PointsPerSide; pointNo++)
+            {
+                float x;
+
+                if (pointNo == 0)                
+                    x = 0;                
+                else                
+                    x = ( Width / PointsPerSide ) * pointNo;                
+
+                points.Add(new System.Drawing.PointF(x, 0));                
+            }
+
+            // Right
+            for (float pointNo = 0; pointNo < PointsPerSide; pointNo++)
+            {
+                float y;
+
+                if (pointNo == 0)                
+                    y = 0;                
+                else                
+                    y = (Height / PointsPerSide) * pointNo;                
+
+                points.Add(new System.Drawing.PointF(Width, y));
+            }
+
+            // Bottom
+            for (float pointNo = PointsPerSide; pointNo > 0; pointNo--)
+            {
+                float x;
+
+                if (pointNo == 0)
+                    x = Width;
+                else
+                    x = (Width/ PointsPerSide) * pointNo;
+
+                points.Add(new System.Drawing.PointF(x, Height));
+            }
+
+            // Left
+            for (float pointNo = PointsPerSide; pointNo > 0; pointNo--)
+            {
+                float y;
+
+                if (pointNo == 0)
+                    y = Height;
+                else
+                    y = (Height/ PointsPerSide) * pointNo;
+
+                points.Add(new System.Drawing.PointF(0, y));
+            }
+
+            FaceState faceState = new FaceState()
+            {
+                Points = points.ToArray()
+            };
+
+            FaceState.SaveToFile(faceState, "square.dat");
+        }
+
 
         [TestMethod]
         public void TestSaveAndLoadToFile()

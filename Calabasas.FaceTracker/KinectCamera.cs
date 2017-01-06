@@ -5,8 +5,10 @@ using System.Linq;
 
 namespace Calabasas
 {
-    public class FaceCamera : IFaceCamera<System.Drawing.PointF>
+    public class KinectCamera : IFaceCamera<System.Drawing.PointF>
     {
+        private const int IndexTopOfHeadPoint = 29;
+
         private KinectSensor _sensor = null;
         private BodyFrameSource _bodySource = null;
         private BodyFrameReader _bodyReader = null;
@@ -22,9 +24,17 @@ namespace Calabasas
 
         private FaceState _faceState = new FaceState();
 
+        int IFaceCamera<System.Drawing.PointF>.IndexTopOfHeadPoint
+        {
+            get
+            {
+                return IndexTopOfHeadPoint;
+            }
+        }
+
         public event EventHandler<FaceState> OnFaceChanged;
         public event EventHandler<bool> OnTrackingFace;
-        
+
         void IFaceCamera<System.Drawing.PointF>.Start()
         {
             _sensor = KinectSensor.GetDefault();

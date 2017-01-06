@@ -6,41 +6,36 @@ Phase 1
 
 [X] Center Head
 
-    Stop using bounding box. Too course of measurement (int). Instead,
-    Given all points find point closest to center of head. This index is the "center".
-    The FaceState Center property should just regurgitate the vertex at this index.
+Stop using bounding box. Too course of measurement (int). Instead,
+Given all points find point closest to center of head. This index is the "center".
+The FaceState Center property should just regurgitate the vertex at this index.
 
 [X] Display info on-screen
 
 [X] Mouse
 
-    Click should display the face point in on-screen info.
+Click should display the face point in on-screen info.
 
 [ ]	Determine which Kinect points/indices map to desired facial features
 
-    Create enums for each.
-    Render eyes, nose, etc.. using enums.
+Create enums for each.
+Render eyes, nose, etc.. using enums.
 
-[ ] Figure out some way to save / load facestate
-
-    No longer expose draw() method. Only allow loading of FaceState state from file.
-    For testing can create a FaceState an click (L) to load.
-    Display datasource in debug info: Kinnect | File
+[x] Figure out some way to save / load facestate
 
 [ ] Keyboard
 
-    (+/-) should scale face
-    (r)ender :  All points | Show curated points and lines | Jack-O-Lantern
-    (b)ounding box/center : Show bounding box and center point.
-    (s)ave : Saves the current state to file.
-    (l)ive : Toggles between live feed from Kinect and the last saved state.
-    (d)ebug info : Show Debug Info.
+(+/-) should scale face
+(r)ender :  All points | Show curated points and lines | Jack-O-Lantern
+(b)ounding box/center : Show bounding box and center point.
+(s)ave : Saves the current state to file.
+(d)ebug info : Show Debug Info.
 
 [ ] Display Kinect state.
 
 [ ] Optimize DirectX
 
-    Might need to migrate to Direct3D; Rendering points is expensive.
+Might need to migrate to Direct3D; Rendering points is expensive.
 
 Phase 2
 -------------------------------------------
@@ -323,6 +318,20 @@ Day 25 - Hooking up Keyboard Commands
 The most useful thing right now would be to save/restore the state. This would allow me to capture a "still" of the Kinect and then work with it offline.
 
 This link shows how to save/load a struct to file: http://stackoverflow.com/questions/17338571/writing-bytes-from-a-struct-into-a-file-with-c-sharp
+
+Day 26 - Creating a Mock/Dummy Camera
+----------------------------------------------
+
+From the command-line you can now load a previosuly saved face by targeting a "state" file. This will bypass the Kinect and render whatever snapshot is stored in the file. 
+
+A "state" file can be created by clicking (s) when running normally. I also have created a UnitTest to dummy up a file - it renders a square.
+
+Why do all this? 
+
+The Kinect will only run on Windows 8+ and I occasionally work off a Windows 7 machine. Also, it would be nice to work with a face that is not "live".
+
+Lastly, early on in this project I noted how to install the SDK. Well, that was for Kinect v1. Kinect v2 has a different SDK here https://www.microsoft.com/en-us/download/details.aspx?id=44561 
+as well as a Kinect Runtime (https://www.microsoft.com/en-us/download/details.aspx?id=44559) that can be installed for non-developers.
 
 
 

@@ -15,20 +15,14 @@ namespace Calabasas
     {
         private const int Width = 1280;
         private const int Height = 720;
-        private const int ExpectedFacePoints = 121;
-        private const int IndexTopOfHeadPoint = 29;
         private const float PointSize = 0.2f;
         private const float ClickSize = 2f;
-        private const int ClickTimeoutSeconds = 3;
+        private const int EventTimeoutSeconds = 3;
         private const float ZoomDelta = 0.2f;
         private const string StateFilePath = "state.dat";
 
         private float zoom = 3.0f;
         private bool showDebugInfo = true;
-        /// <summary>
-        /// True, if the data being displayed is from the Kinect.
-        /// </summary>
-        private bool isKinectFeed = true;
 
         IFaceCamera<System.Drawing.PointF> faceCamera;
 
@@ -47,8 +41,6 @@ namespace Calabasas
         private Vector2[] facePoints = { };
         private Vector2 faceCenter = new Vector2(0, 0);
         private RectangleF faceBoundingBox = new RectangleF();
-        private int expectedFacePoints = ExpectedFacePoints;
-        private int indexTopOfHeadPoint = IndexTopOfHeadPoint;
 
         private bool isLeftEyeClosed;
         private bool isRightEyeClosed;
@@ -59,18 +51,19 @@ namespace Calabasas
         
         private int? selectedFacePointIndex;
         private TimeSpan selectedFacePointTimeout;
+        private TimeSpan savedFaceStateTimeout;
         FramesPerSecond framesPerSecond;
 
         private Matrix3x2 transformation = Matrix3x2.Identity;
 
-        //private Vector2[] leftEyebrow = { };
-        //private Vector2[] rightEyebrow = { };
-        //private Vector2[] mouth = { };
-        //private Vector2[] nose = { };
-        //private Vector2[] leftEye = { };
-        //private Vector2[] leftPupil = { };
-        //private Vector2[] rightEye = { };
-        //private Vector2[] rightPupil = { };
+        private Vector2[] leftEyebrow = { };
+        private Vector2[] rightEyebrow = { };
+        private Vector2[] mouth = { };
+        private Vector2[] nose = { };
+        private Vector2[] leftEye = { };
+        private Vector2[] leftPupil = { };
+        private Vector2[] rightEye = { };
+        private Vector2[] rightPupil = { };
 
         public TextFormat TextFormat { get; private set; }
         public SolidColorBrush SceneColorBrush { get; private set; }
@@ -96,14 +89,12 @@ namespace Calabasas
             }
         }
 
-        public PumpkinFaceRenderer(IFaceCamera<System.Drawing.PointF> faceCamera, int expectedFacePoints = ExpectedFacePoints, int indexTopOfHeadPoint = IndexTopOfHeadPoint)
+        public PumpkinFaceRenderer(IFaceCamera<System.Drawing.PointF> faceCamera)
         {
             renderForm = new RenderForm("Calabasas");
             renderForm.AllowUserResizing = true;
 
             this.faceCamera = faceCamera;
-            this.expectedFacePoints = expectedFacePoints;
-            this.indexTopOfHeadPoint = indexTopOfHeadPoint;
 
             renderForm.KeyPress += OnRenderFormKeyPress;
 
@@ -175,49 +166,6 @@ namespace Calabasas
             RenderLoop.Run(renderForm, OnRenderCallback);
         }
 
-        public void Draw(FaceState faceState, bool isKinectFeed = false)
-        {
-            this.isKinectFeed = isKinectFeed;
-
-            this.isLeftEyeClosed = faceState.IsLeftEyeClosed;
-            this.isRightEyeClosed = faceState.IsRightEyeClosed;
-            this.isHappy = faceState.IsHappy;
-            this.isMouthOpen = faceState.IsMouthOpen;
-            this.isMouthMoved = faceState.IsMouthMoved;
-            this.isWearingGlasses = faceState.IsWearingGlasses;
-
-            this.facePoints = faceState.Points.ConvertToVector2();
-
-            this.faceBoundingBox = faceState.BoundingBox.ConvertToRectangleF();
-
-            this.faceCenter = new Vector2(
-                        this.facePoints[this.indexTopOfHeadPoint].X,
-                        this.facePoints[this.indexTopOfHeadPoint].Y + (this.faceBoundingBox.Height / 2.0f));
-
-            this.transformation = CalculateTransformation(this.faceCenter, this.zoom, Width, Height);
-        }
-
-        //public void Draw(System.Drawing.PointF [] points)
-        //{
-        //    Vector2[] newPoints = new Vector2[points.Length];
-        //    float totalX = 0,
-        //            totalY = 0;
-
-        //    // Convert PointF to Vector2 and determine center.
-        //    for (int pointIndex = 0; pointIndex < points.Length; pointIndex++)
-        //    {
-        //        newPoints[pointIndex] = new Vector2(points[pointIndex].X, points[pointIndex].Y);
-        //        totalX += points[pointIndex].X;
-        //        totalY += points[pointIndex].Y;
-        //    }
-
-        //    this.points = newPoints;
-        //    this.center = new Vector2(totalX / points.Length, totalY / points.Length);
-
-        //    if (this.IsDrawingFace())
-        //        this.GenerateFace();
-        //}
-
         public void Dispose()
         {
             this.faceCamera.Stop();
@@ -241,84 +189,100 @@ namespace Calabasas
             facePointBrush.Dispose();
         }
 
-        private bool IsDrawingFace()
+        private void GenerateFace()
         {
-            return (this.facePoints != null && this.facePoints.Length == ExpectedFacePoints);
+            this.leftEyebrow = new Vector2[] {
+                this.facePoints[(int)FacePoints.LeftEyebrow0],
+                this.facePoints[(int)FacePoints.LeftEyebrow1],
+                this.facePoints[(int)FacePoints.LeftEyebrow2],
+                this.facePoints[(int)FacePoints.LeftEyebrow3]
+            };
+
+            this.rightEyebrow = new Vector2[] {
+                this.facePoints[(int)FacePoints.RightEyebrow0],
+                this.facePoints[(int)FacePoints.RightEyebrow1],
+                this.facePoints[(int)FacePoints.RightEyebrow2],
+                this.facePoints[(int)FacePoints.RightEyebrow3]
+            };
+
+            this.nose = new Vector2[] {
+                this.facePoints[(int)FacePoints.Nose0],
+                this.facePoints[(int)FacePoints.Nose1],
+                this.facePoints[(int)FacePoints.Nose2],
+                this.facePoints[(int)FacePoints.Nose3],
+                this.facePoints[(int)FacePoints.Nose4],
+                this.facePoints[(int)FacePoints.Nose5],
+                this.facePoints[(int)FacePoints.Nose6],
+                this.facePoints[(int)FacePoints.Nose7],
+                this.facePoints[(int)FacePoints.Nose8],
+                this.facePoints[(int)FacePoints.Nose9],
+                this.facePoints[(int)FacePoints.Nose10]
+            };
+
+            this.mouth = new Vector2[] {
+                this.facePoints[(int)FacePoints.Mouth0],
+                this.facePoints[(int)FacePoints.Mouth1],
+                this.facePoints[(int)FacePoints.Mouth2],
+                this.facePoints[(int)FacePoints.Mouth3],
+                this.facePoints[(int)FacePoints.Mouth4],
+                this.facePoints[(int)FacePoints.Mouth5],
+                this.facePoints[(int)FacePoints.Mouth6]
+            };
+
+            this.leftEye = new Vector2[] {
+                this.facePoints[(int)FacePoints.LeftEye0],
+                this.facePoints[(int)FacePoints.LeftEye1],
+                this.facePoints[(int)FacePoints.LeftEye2],
+                this.facePoints[(int)FacePoints.LeftEye3],
+                this.facePoints[(int)FacePoints.LeftEye4],
+                this.facePoints[(int)FacePoints.LeftEye5],
+                this.facePoints[(int)FacePoints.LeftEye6],
+                this.facePoints[(int)FacePoints.LeftEye7]
+            };
+
+            this.rightEye = new Vector2[] {
+                this.facePoints[(int)FacePoints.RightEye0],
+                this.facePoints[(int)FacePoints.RightEye1],
+                this.facePoints[(int)FacePoints.RightEye2]
+            };
+
+            this.rightPupil = new Vector2[] {
+                this.facePoints[(int)FacePoints.RightPupil0],
+                this.facePoints[(int)FacePoints.RightPupil1],
+                this.facePoints[(int)FacePoints.RightPupil2],
+                this.facePoints[(int)FacePoints.RightPupil3]
+            };
+
+            this.leftPupil = new Vector2[] {
+                this.facePoints[(int)FacePoints.LeftPupil0],
+                this.facePoints[(int)FacePoints.LeftPupil1],
+                this.facePoints[(int)FacePoints.LeftPupil2],
+                this.facePoints[(int)FacePoints.LeftPupil3]
+            };
         }
 
-        //private void GenerateFace()
-        //{
-        //    this.leftEyebrow = new Vector2[] {
-        //        points[(int)FacePoints.LeftEyebrow0],
-        //        points[(int)FacePoints.LeftEyebrow1],
-        //        points[(int)FacePoints.LeftEyebrow2],
-        //        points[(int)FacePoints.LeftEyebrow3]
-        //    };
 
-        //    this.rightEyebrow = new Vector2[] {
-        //        points[(int)FacePoints.RightEyebrow0],
-        //        points[(int)FacePoints.RightEyebrow1],
-        //        points[(int)FacePoints.RightEyebrow2],
-        //        points[(int)FacePoints.RightEyebrow3]
-        //    };
+        private void Draw(FaceState faceState)
+        {
+            this.isLeftEyeClosed = faceState.IsLeftEyeClosed;
+            this.isRightEyeClosed = faceState.IsRightEyeClosed;
+            this.isHappy = faceState.IsHappy;
+            this.isMouthOpen = faceState.IsMouthOpen;
+            this.isMouthMoved = faceState.IsMouthMoved;
+            this.isWearingGlasses = faceState.IsWearingGlasses;
 
-        //    this.nose = new Vector2[] {
-        //        points[(int)FacePoints.Nose0],
-        //        points[(int)FacePoints.Nose1],
-        //        points[(int)FacePoints.Nose2],
-        //        points[(int)FacePoints.Nose3],
-        //        points[(int)FacePoints.Nose4],
-        //        points[(int)FacePoints.Nose5],
-        //        points[(int)FacePoints.Nose6],
-        //        points[(int)FacePoints.Nose7],
-        //        points[(int)FacePoints.Nose8],
-        //        points[(int)FacePoints.Nose9],
-        //        points[(int)FacePoints.Nose10]
-        //    };
+            this.facePoints = faceState.Points.ConvertToVector2();
 
-        //    this.mouth = new Vector2[] {
-        //        points[(int)FacePoints.Mouth0],
-        //        points[(int)FacePoints.Mouth1],
-        //        points[(int)FacePoints.Mouth2],
-        //        points[(int)FacePoints.Mouth3],
-        //        points[(int)FacePoints.Mouth4],
-        //        points[(int)FacePoints.Mouth5],
-        //        points[(int)FacePoints.Mouth6]
-        //    };
+            this.faceBoundingBox = faceState.BoundingBox.ConvertToRectangleF();
 
-        //    this.leftEye = new Vector2[] {
-        //        points[(int)FacePoints.LeftEye0],
-        //        points[(int)FacePoints.LeftEye1],
-        //        points[(int)FacePoints.LeftEye2],
-        //        points[(int)FacePoints.LeftEye3],
-        //        points[(int)FacePoints.LeftEye4],
-        //        points[(int)FacePoints.LeftEye5],
-        //        points[(int)FacePoints.LeftEye6],
-        //        points[(int)FacePoints.LeftEye7]
+            this.faceCenter = new Vector2(
+                        this.facePoints[this.faceCamera.IndexTopOfHeadPoint].X,
+                        this.facePoints[this.faceCamera.IndexTopOfHeadPoint].Y + (this.faceBoundingBox.Height / 2.0f));
 
-        //    };
+            this.transformation = CalculateTransformation(this.faceCenter, this.zoom, Width, Height);
 
-        //    this.rightEye = new Vector2[] {
-        //        points[(int)FacePoints.RightEye0],
-        //        points[(int)FacePoints.RightEye1],
-        //        points[(int)FacePoints.RightEye2]
-        //    };
-
-        //    this.rightPupil = new Vector2[] {
-        //        points[(int)FacePoints.RightPupil0],
-        //        points[(int)FacePoints.RightPupil1],
-        //        points[(int)FacePoints.RightPupil2],
-        //        points[(int)FacePoints.RightPupil3]
-        //    };
-
-        //    this.leftPupil = new Vector2[] {
-        //        points[(int)FacePoints.LeftPupil0],
-        //        points[(int)FacePoints.LeftPupil1],
-        //        points[(int)FacePoints.LeftPupil2],
-        //        points[(int)FacePoints.LeftPupil3]
-        //    };
-        //}
-
+            // this.GenerateFace();
+        }
 
         private void OnRenderCallback()
         {
@@ -330,8 +294,6 @@ namespace Calabasas
 
             d2dRenderTarget.Transform = this.transformation;
 
-            //if (this.IsDrawingFace())
-            //{
             //    renderPolygon(this.leftEyebrow);
             //    renderPolygon(this.leftEye);
             //    renderPolygon(this.leftPupil);
@@ -340,13 +302,9 @@ namespace Calabasas
             //    renderPolygon(this.rightPupil);
             //    renderPolygon(this.mouth);
             //    renderPolygon(this.nose);
-            //}
-            //else
-            //{
-            //    //renderPolygon(this.points);
-            //}
 
-            renderPoints(facePoints);
+            renderPolygon(this.facePoints);
+            //renderPoints(facePoints);
 
             d2dRenderTarget.RestoreDrawingState(drawingStateBlock);
 
@@ -387,6 +345,8 @@ namespace Calabasas
             // Column 3
             if (this.facePoints != null && this.facePoints.Length > 0 && this.selectedFacePointIndex.HasValue && this.selectedFacePointTimeout > runTime)
                 renderText(new Vector2(400, 0), String.Format("Clicked Point Index: {0} ({1},{2})", this.selectedFacePointIndex, this.facePoints[this.selectedFacePointIndex.Value].X, this.facePoints[this.selectedFacePointIndex.Value].Y));
+            if (this.savedFaceStateTimeout > runTime)
+                renderText(new Vector2(400, 20), String.Format(string.Format("Face saved to {0}", StateFilePath)));
         }
 
         private void renderPoints (SharpDX.Vector2 [] points)
@@ -460,8 +420,7 @@ namespace Calabasas
 
         private void OnFaceChanged(object sender, FaceState faceState)
         {
-            if (this.isKinectFeed)
-                this.Draw(faceState, true);
+            this.Draw(faceState);
         }
 
         private void OnRenderFormKeyPress(object sender, System.Windows.Forms.KeyPressEventArgs e)
@@ -484,28 +443,8 @@ namespace Calabasas
                     e.Handled = true;
                     break;
                 case 'S':
-                    if (FaceState.SaveToFile(this.CurrentFaceState, StateFilePath))
-                    {
-                        // Display state in debug info.
-                    }
-                    e.Handled = true;
-                    break;
-                case 'L':
-                    FaceState savedFaceState;
-
-                    if (this.isKinectFeed)
-                    {
-                        if (FaceState.LoadFromFile(StateFilePath, out savedFaceState))
-                        {
-                            this.isKinectFeed = false;
-                            this.Draw(savedFaceState);
-                        }
-                    }
-                    else
-                    {
-                        this.isKinectFeed = true;
-                    }
-
+                    if (FaceState.SaveToFile(this.CurrentFaceState, StateFilePath))                    
+                        this.savedFaceStateTimeout = this.framesPerSecond.RunTime.Add(new TimeSpan(0, 0, EventTimeoutSeconds));                    
                     e.Handled = true;
                     break;
             }           
@@ -542,7 +481,7 @@ namespace Calabasas
                     break;
                 }
 
-            this.selectedFacePointTimeout = this.framesPerSecond.RunTime.Add(new TimeSpan(0, 0, ClickTimeoutSeconds));
+            this.selectedFacePointTimeout = this.framesPerSecond.RunTime.Add(new TimeSpan(0, 0, EventTimeoutSeconds));
         }
     }
 }

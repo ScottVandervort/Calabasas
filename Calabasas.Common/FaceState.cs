@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Calabasas
 {
@@ -15,7 +14,7 @@ namespace Calabasas
         public bool IsMouthOpen;
         public bool IsMouthMoved;
         public bool IsWearingGlasses;
-        
+
         internal System.Drawing.RectangleF boundingBox;
 
         public System.Drawing.RectangleF BoundingBox
