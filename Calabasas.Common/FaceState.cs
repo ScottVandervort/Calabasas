@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
@@ -32,10 +33,10 @@ namespace Calabasas
         {
             bool result = false;
 
-            using (FileStream file = File.OpenWrite(path))
+            using (StreamWriter file = File.CreateText(path))
             {
-                var writer = new BinaryFormatter();
-                writer.Serialize(file, faceState); // Writes the entire list.
+                JsonSerializer serializer = new JsonSerializer();
+                serializer.Serialize(file, faceState);
                 result = true;
             }
 
@@ -50,12 +51,19 @@ namespace Calabasas
 
             try
             {
-                using (FileStream file = File.OpenRead(path))
+                using (StreamReader file = File.OpenText(path))
                 {
-                    var reader = new BinaryFormatter();
-                    faceState = (FaceState)reader.Deserialize(file);
+                    JsonSerializer serializer = new JsonSerializer();
+                    faceState = (FaceState)serializer.Deserialize(file, typeof(FaceState));
                     result = true;
                 }
+
+                //using (FileStream file = File.OpenRead(path))
+                //{
+                //    var reader = new BinaryFormatter();
+                //    faceState = (FaceState)reader.Deserialize(file);
+                //    result = true;
+                //}
             }
             catch (FileNotFoundException)
             {
