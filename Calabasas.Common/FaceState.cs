@@ -1,7 +1,10 @@
 ﻿using System;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Calabasas
 {
+    [Serializable]
     public struct FaceState
     {
         public System.Drawing.PointF [] Points;
@@ -23,6 +26,43 @@ namespace Calabasas
 
                 return this.boundingBox;
             }
+        }
+
+        static public bool SaveToFile ( FaceState faceState, string path )
+        {
+            bool result = false;
+
+            using (FileStream file = File.OpenWrite(path))
+            {
+                var writer = new BinaryFormatter();
+                writer.Serialize(file, faceState); // Writes the entire list.
+                result = true;
+            }
+
+            return result;
+        }
+
+        static public bool LoadFromFile ( string path, out FaceState faceState )
+        {
+            bool result = false;
+
+            faceState = new FaceState();
+
+            try
+            {
+                using (FileStream file = File.OpenRead(path))
+                {
+                    var reader = new BinaryFormatter();
+                    faceState = (FaceState)reader.Deserialize(file);
+                    result = true;
+                }
+            }
+            catch (FileNotFoundException)
+            {
+                result = false;
+            }
+
+            return result;
         }
 
         static public System.Drawing.RectangleF DetermineBoundingBox ( System.Drawing.PointF [] points)

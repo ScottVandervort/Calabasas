@@ -36,6 +36,23 @@
             return result;
         }
 
+        public static System.Drawing.PointF[] ConvertToVector2(this SharpDX.Vector2[] points)
+        {
+            System.Drawing.PointF [] result = { };
+
+            if (points != null && points.Length > 0)
+            {
+                result = new System.Drawing.PointF[points.Length];
+
+                for (int index = 0; index < points.Length; index++)
+                {
+                    result[index] = new System.Drawing.PointF(points[index].X, points[index].Y);
+                }
+            }
+
+            return result;
+        }
+
         public static SharpDX.Mathematics.Interop.RawVector2 ConvertToRawVector2(this SharpDX.Vector2 vector)
         {
             return new SharpDX.Mathematics.Interop.RawVector2(vector.X,vector.Y);

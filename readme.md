@@ -6,33 +6,41 @@ Phase 1
 
 [X] Center Head
 
-Stop using bounding box. Too course of measurement (int). Instead,
-Given all points find point closest to center of head. This index is the "center".
-The FaceState Center property should just regurgitate the vertex at this index.
+    Stop using bounding box. Too course of measurement (int). Instead,
+    Given all points find point closest to center of head. This index is the "center".
+    The FaceState Center property should just regurgitate the vertex at this index.
 
 [X] Display info on-screen
 
 [X] Mouse
 
-Click should display the face point in on-screen info.
-
-[ ] Curate Kinect points
+    Click should display the face point in on-screen info.
 
 [ ]	Determine which Kinect points/indices map to desired facial features
 
-Create enums for each.
-Render eyes, nose, etc.. using enums.
+    Create enums for each.
+    Render eyes, nose, etc.. using enums.
+
+[ ] Figure out some way to save / load facestate
+
+    No longer expose draw() method. Only allow loading of FaceState state from file.
+    For testing can create a FaceState an click (L) to load.
+    Display datasource in debug info: Kinnect | File
 
 [ ] Keyboard
 
-(+/-) should scale face
-(s)how :  All Kinect Points | Curated Kinect Points | Show Curated Kinect Lines | Show Curated Kinect Points and Lines
-(d)ebug : Show bounding box and center point.
-(c)apture : Raw Kinect Points to file.
+    (+/-) should scale face
+    (r)ender :  All points | Show curated points and lines | Jack-O-Lantern
+    (b)ounding box/center : Show bounding box and center point.
+    (s)ave : Saves the current state to file.
+    (l)ive : Toggles between live feed from Kinect and the last saved state.
+    (d)ebug info : Show Debug Info.
+
+[ ] Display Kinect state.
 
 [ ] Optimize DirectX
 
-Might need to migrate to Direct3D; Rendering points is expensive.
+    Might need to migrate to Direct3D; Rendering points is expensive.
 
 Phase 2
 -------------------------------------------
@@ -309,7 +317,12 @@ I also started drawing rectangles instead of ellipses. It has spec up the frames
 Fortunately, dots are only going to be displayed during debug. The actual face will consists of lines/filled polygons.
 I am not going to look into migrating to Direct3D unless line/polygon rendering is also abysmal.
 
+Day 25 - Hooking up Keyboard Commands
+----------------------------------------------
 
+The most useful thing right now would be to save/restore the state. This would allow me to capture a "still" of the Kinect and then work with it offline.
+
+This link shows how to save/load a struct to file: http://stackoverflow.com/questions/17338571/writing-bytes-from-a-struct-into-a-file-with-c-sharp
 
 
 

@@ -12,7 +12,6 @@ namespace Calabasas.Test
 
             Assert.IsTrue(faceState.boundingBox == System.Drawing.RectangleF.Empty);
 
-
             Assert.IsTrue(faceState.IsHappy == false);
             Assert.IsTrue(faceState.IsLeftEyeClosed == false);
             Assert.IsTrue(faceState.IsRightEyeClosed == false);
@@ -91,6 +90,45 @@ namespace Calabasas.Test
               };
                     
             Assert.IsTrue(System.Drawing.RectangleF.Equals(new System.Drawing.RectangleF(1, 2, 3, 4), faceState.BoundingBox));
+        }
+
+        [TestMethod]
+        public void TestSaveAndLoadToFile()
+        {
+            FaceState originalFaceState = new FaceState();
+            FaceState loadedFaceState;
+
+            originalFaceState.IsHappy = true;
+
+            originalFaceState.Points = new System.Drawing.PointF[]
+            {
+                new System.Drawing.PointF(1,1),
+                new System.Drawing.PointF(2,2),
+                new System.Drawing.PointF(3,3)
+            };
+
+            FaceState.SaveToFile(originalFaceState, "backup.dat");
+
+            Assert.IsTrue(FaceState.LoadFromFile("backup.dat", out loadedFaceState));
+
+            Assert.IsTrue(loadedFaceState.IsHappy);
+            Assert.IsFalse(loadedFaceState.IsLeftEyeClosed);
+            Assert.IsFalse(loadedFaceState.IsRightEyeClosed);
+            Assert.IsFalse(loadedFaceState.IsMouthMoved);
+            Assert.IsFalse(loadedFaceState.IsMouthOpen);
+            Assert.IsFalse(loadedFaceState.IsWearingGlasses);
+            Assert.IsTrue(loadedFaceState.Points.Length == 3);
+            Assert.IsTrue(loadedFaceState.Points[0] == originalFaceState.Points[0]);
+            Assert.IsTrue(loadedFaceState.Points[1] == originalFaceState.Points[1]);
+            Assert.IsTrue(loadedFaceState.Points[2] == originalFaceState.Points[2]);
+        }
+
+        [TestMethod]
+        public void TestLoadFromFile_NoFile()
+        {
+            FaceState faceState = new FaceState();
+
+            Assert.IsFalse(FaceState.LoadFromFile("nofile.dat", out faceState));            
         }
     }
 }

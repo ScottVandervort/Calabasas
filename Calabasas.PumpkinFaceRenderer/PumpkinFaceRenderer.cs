@@ -20,6 +20,15 @@ namespace Calabasas
         private const float PointSize = 0.2f;
         private const float ClickSize = 2f;
         private const int ClickTimeoutSeconds = 3;
+        private const float ZoomDelta = 0.2f;
+        private const string StateFilePath = "state.dat";
+
+        private float zoom = 3.0f;
+        private bool showDebugInfo = true;
+        /// <summary>
+        /// True, if the data being displayed is from the Kinect.
+        /// </summary>
+        private bool isKinectFeed = true;
 
         IFaceCamera<System.Drawing.PointF> faceCamera;
 
@@ -34,10 +43,12 @@ namespace Calabasas
         private Texture2D backBuffer;
         private Surface surface;
         private DrawingStateBlock drawingStateBlock;
-
+        
         private Vector2[] facePoints = { };
         private Vector2 faceCenter = new Vector2(0, 0);
         private RectangleF faceBoundingBox = new RectangleF();
+        private int expectedFacePoints = ExpectedFacePoints;
+        private int indexTopOfHeadPoint = IndexTopOfHeadPoint;
 
         private bool isLeftEyeClosed;
         private bool isRightEyeClosed;
@@ -68,12 +79,31 @@ namespace Calabasas
         private SolidColorBrush facePointBrush;
         private Color facePointPenColor = Color.Orange;
 
-        public PumpkinFaceRenderer(IFaceCamera<System.Drawing.PointF> faceCamera)
+        private FaceState CurrentFaceState
+        {
+            get
+            {
+                return new FaceState()
+                {
+                    Points = this.facePoints.ConvertToVector2(),
+                    IsHappy = this.isHappy,
+                    IsLeftEyeClosed = this.isLeftEyeClosed,
+                    IsRightEyeClosed = this.isRightEyeClosed,
+                    IsMouthMoved = this.isMouthMoved,
+                    IsMouthOpen = this.isMouthOpen,
+                    IsWearingGlasses = this.isWearingGlasses
+                };
+            }
+        }
+
+        public PumpkinFaceRenderer(IFaceCamera<System.Drawing.PointF> faceCamera, int expectedFacePoints = ExpectedFacePoints, int indexTopOfHeadPoint = IndexTopOfHeadPoint)
         {
             renderForm = new RenderForm("Calabasas");
             renderForm.AllowUserResizing = true;
 
             this.faceCamera = faceCamera;
+            this.expectedFacePoints = expectedFacePoints;
+            this.indexTopOfHeadPoint = indexTopOfHeadPoint;
 
             renderForm.KeyPress += OnRenderFormKeyPress;
 
@@ -145,8 +175,10 @@ namespace Calabasas
             RenderLoop.Run(renderForm, OnRenderCallback);
         }
 
-        public void Draw(FaceState faceState)
+        public void Draw(FaceState faceState, bool isKinectFeed = false)
         {
+            this.isKinectFeed = isKinectFeed;
+
             this.isLeftEyeClosed = faceState.IsLeftEyeClosed;
             this.isRightEyeClosed = faceState.IsRightEyeClosed;
             this.isHappy = faceState.IsHappy;
@@ -159,17 +191,10 @@ namespace Calabasas
             this.faceBoundingBox = faceState.BoundingBox.ConvertToRectangleF();
 
             this.faceCenter = new Vector2(
-                        this.facePoints[IndexTopOfHeadPoint].X,
-                        this.facePoints[IndexTopOfHeadPoint].Y + (this.faceBoundingBox.Height / 2.0f));
+                        this.facePoints[this.indexTopOfHeadPoint].X,
+                        this.facePoints[this.indexTopOfHeadPoint].Y + (this.faceBoundingBox.Height / 2.0f));
 
-            // Before rendering the facial points:
-            // 1) Translate the target so that the points will be centered.
-            // 2) Scale the points to fit the target.
-            // 3) Translate the target to the center of the client
-            this.transformation =
-                Matrix3x2.Translation(-faceCenter.X, -faceCenter.Y) *
-                Matrix3x2.Scaling(3, 3) *
-                Matrix3x2.Translation(Width / 2.0f, Height / 2.0f);            
+            this.transformation = CalculateTransformation(this.faceCenter, this.zoom, Width, Height);
         }
 
         //public void Draw(System.Drawing.PointF [] points)
@@ -297,8 +322,6 @@ namespace Calabasas
 
         private void OnRenderCallback()
         {
-            TimeSpan runTime = framesPerSecond.RunTime;
-
             d2dRenderTarget.BeginDraw();
 
             d2dRenderTarget.Clear(Color.Black);
@@ -327,24 +350,43 @@ namespace Calabasas
 
             d2dRenderTarget.RestoreDrawingState(drawingStateBlock);
 
-            renderText(new Vector2(0, 0), String.Format("FPS: {0}", framesPerSecond.GetFPS().ToString()));
-            renderText(new Vector2(0, 20), String.Format("Runtime: {0}", runTime.ToString(@"hh\:mm\:ss\:ff")));
-            renderText(new Vector2(0, 40), String.Format("Total Face Points: {0}", ((this.facePoints != null) ? this.facePoints.Length : 0)));
-            renderText(new Vector2(0, 60), String.Format("Is Left Eye Closed: {0}", this.isLeftEyeClosed));
-            renderText(new Vector2(0, 80), String.Format("Is Right Eye Closed: {0}", this.isRightEyeClosed));
-            renderText(new Vector2(0, 100), String.Format("Is Happy: {0}", this.isHappy));
-            renderText(new Vector2(0, 120), String.Format("Is Mouth Open: {0}", this.isMouthOpen));
-            renderText(new Vector2(0, 140), String.Format("Is Mouth Moved: {0}", this.isMouthMoved));
-            renderText(new Vector2(0, 160), String.Format("Is Wearing Glasses: {0}", this.isWearingGlasses));
-            renderText(new Vector2(0, 180), String.Format("Is Wearing Glasses: {0}", this.isWearingGlasses));
-            if (this.facePoints != null && this.facePoints.Length > 0 && this.selectedFacePointIndex.HasValue && this.selectedFacePointTimeout > runTime)
-                renderText(new Vector2(0, 200), String.Format("Clicked Point Index: {0} ({1},{2})", this.selectedFacePointIndex, this.facePoints[this.selectedFacePointIndex.Value].X, this.facePoints[this.selectedFacePointIndex.Value].Y));
+            if (this.showDebugInfo)
+                renderDebugInfo();
 
             d2dRenderTarget.EndDraw();
 
             swapChain.Present(0, PresentFlags.None);
 
             framesPerSecond.Frame();
+        }
+
+        private void renderDebugInfo ()
+        {
+            TimeSpan runTime = framesPerSecond.RunTime;
+
+            // Column 1
+            renderText(new Vector2(0, 0), String.Format("FPS: {0}", framesPerSecond.GetFPS().ToString()));
+            renderText(new Vector2(0, 20), String.Format("Runtime: {0}", runTime.ToString(@"hh\:mm\:ss\:ff")));
+            renderText(new Vector2(0, 40), String.Format("Total Face Points: {0}", ((this.facePoints != null) ? this.facePoints.Length : 0)));
+            renderText(new Vector2(0, 60), String.Format("Zoom: {0}x", this.zoom));
+
+            // Column 2
+            if (this.isLeftEyeClosed)
+                renderText(new Vector2(200, 0), "Left Eye Closed");
+            if (this.isRightEyeClosed)
+                renderText(new Vector2(200, 20), "Right Eye Closed");
+            if (this.isHappy)
+                renderText(new Vector2(200, 40), "Is Happy");
+            if (this.isMouthOpen)
+                renderText(new Vector2(200, 60), "Mouth Open");
+            if (this.isMouthMoved)
+                renderText(new Vector2(200, 80), "Mouth Moved");
+            if (this.isWearingGlasses)
+                renderText(new Vector2(200, 100), "Is Wearing Glasses");
+
+            // Column 3
+            if (this.facePoints != null && this.facePoints.Length > 0 && this.selectedFacePointIndex.HasValue && this.selectedFacePointTimeout > runTime)
+                renderText(new Vector2(400, 0), String.Format("Clicked Point Index: {0} ({1},{2})", this.selectedFacePointIndex, this.facePoints[this.selectedFacePointIndex.Value].X, this.facePoints[this.selectedFacePointIndex.Value].Y));
         }
 
         private void renderPoints (SharpDX.Vector2 [] points)
@@ -382,7 +424,6 @@ namespace Calabasas
                     using (GeometrySink geometrySink = pathGeometery.Open())
                     {
                         geometrySink.BeginFigure(points[0], new FigureBegin());
-
                         geometrySink.AddLines(vertices);
                         geometrySink.AddLine(vertices[0]);
                         geometrySink.EndFigure(new FigureEnd());
@@ -397,6 +438,21 @@ namespace Calabasas
             }
         }
 
+        static private SharpDX.Matrix3x2 CalculateTransformation (Vector2 faceCenter, float zoom, int deviceWidth, int deviceHeight)
+        {
+            Matrix3x2 result = Matrix3x2.Identity;
+
+            // 1) Translate the target so that the points will be centered.
+            // 2) Scale the points to fit the target.
+            // 3) Translate the target to the center of the device target.
+            result =
+                Matrix3x2.Translation(-faceCenter.X, -faceCenter.Y) *
+                Matrix3x2.Scaling(zoom, zoom) *
+                Matrix3x2.Translation(deviceWidth / 2.0f, deviceHeight / 2.0f);
+
+            return result;
+        }
+
         private void OnTrackingFace(object sender, bool isTracking)
         {
             // TODO: Handle messages from camera.
@@ -404,12 +460,55 @@ namespace Calabasas
 
         private void OnFaceChanged(object sender, FaceState faceState)
         {
-            this.Draw(faceState);
+            if (this.isKinectFeed)
+                this.Draw(faceState, true);
         }
 
         private void OnRenderFormKeyPress(object sender, System.Windows.Forms.KeyPressEventArgs e)
         {
-            // TODO: Handle keystrokes.
+            switch (Char.ToUpperInvariant(e.KeyChar))
+            {
+                case '+':
+                    this.zoom += ZoomDelta;
+                    this.transformation = CalculateTransformation(this.faceCenter, this.zoom, Width, Height);
+                    e.Handled = true;
+                    break;
+                case '-':
+                    this.zoom -= ZoomDelta;
+                    this.zoom = Math.Max(ZoomDelta, this.zoom);
+                    this.transformation = CalculateTransformation(this.faceCenter, this.zoom, Width, Height);
+                    e.Handled = true;
+                    break;
+                case 'D':
+                    this.showDebugInfo = !this.showDebugInfo;
+                    e.Handled = true;
+                    break;
+                case 'S':
+                    if (FaceState.SaveToFile(this.CurrentFaceState, StateFilePath))
+                    {
+                        // Display state in debug info.
+                    }
+                    e.Handled = true;
+                    break;
+                case 'L':
+                    FaceState savedFaceState;
+
+                    if (this.isKinectFeed)
+                    {
+                        if (FaceState.LoadFromFile(StateFilePath, out savedFaceState))
+                        {
+                            this.isKinectFeed = false;
+                            this.Draw(savedFaceState);
+                        }
+                    }
+                    else
+                    {
+                        this.isKinectFeed = true;
+                    }
+
+                    e.Handled = true;
+                    break;
+            }           
         }
 
         private void OnRenderFormMouseClick(object sender, System.Windows.Forms.MouseEventArgs e)
