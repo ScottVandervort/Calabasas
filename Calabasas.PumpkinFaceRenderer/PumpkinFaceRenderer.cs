@@ -271,15 +271,18 @@ namespace Calabasas
             this.isMouthMoved = faceState.IsMouthMoved;
             this.isWearingGlasses = faceState.IsWearingGlasses;
 
-            this.facePoints = faceState.Points.ConvertToVector2();
+            if (faceState.Points != null && faceState.Points.Length > 0)
+            {
+                this.facePoints = faceState.Points.ConvertToVector2();
 
-            this.faceBoundingBox = faceState.BoundingBox.ConvertToRectangleF();
+                this.faceBoundingBox = faceState.BoundingBox.ConvertToRectangleF();
 
-            this.faceCenter = new Vector2(
-                        this.facePoints[this.faceCamera.IndexTopOfHeadPoint].X,
-                        this.facePoints[this.faceCamera.IndexTopOfHeadPoint].Y + (this.faceBoundingBox.Height / 2.0f));
+                this.faceCenter = new Vector2(
+                            this.facePoints[this.faceCamera.IndexTopOfHeadPoint].X,
+                            this.facePoints[this.faceCamera.IndexTopOfHeadPoint].Y + (this.faceBoundingBox.Height / 2.0f));
 
-            this.transformation = CalculateTransformation(this.faceCenter, this.zoom, Width, Height);
+                this.transformation = CalculateTransformation(this.faceCenter, this.zoom, Width, Height);
+            }
 
             // this.GenerateFace();
         }
@@ -303,8 +306,8 @@ namespace Calabasas
             //    renderPolygon(this.mouth);
             //    renderPolygon(this.nose);
 
-            renderPolygon(this.facePoints);
-            //renderPoints(facePoints);
+            //renderPolygon(this.facePoints);
+            renderPoints(facePoints);
 
             d2dRenderTarget.RestoreDrawingState(drawingStateBlock);
 
